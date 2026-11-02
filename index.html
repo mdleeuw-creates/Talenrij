@@ -247,6 +247,16 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
 .onb .actions .btn{flex:1 1 auto}
 .onb .howto{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.mic-res{font-size:.82rem;margin-top:6px;color:var(--muted);min-height:1.2em;overflow-wrap:anywhere}
+.mic-res.ok{color:var(--good)}.mic-res.bad{color:var(--bad)}
+.mic-res.listen{color:var(--c)}
+.mic-res.listen::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:currentColor;margin-right:6px;animation:micpulse 1s ease-in-out infinite}
+@keyframes micpulse{50%{opacity:.25}}
+@media (prefers-reduced-motion:reduce){.mic-res.listen::before{animation:none}}
+.lane.miccur{background:color-mix(in srgb,var(--c) 8%,transparent);border-radius:0 0 10px 10px}
+.micctl{display:flex;flex-direction:column;gap:10px;width:100%}
+.micctl .actions{width:100%}
+.micsum{font-weight:700}.micsum.ok{color:var(--good)}.micsum.bad{color:var(--bad)}
 </style>
 </head>
 <body>
@@ -1154,7 +1164,7 @@ function missingText(){const miss=L.filter(l=>!hasVoice(l));
 if(hasTTS){const load=()=>{try{voices=speechSynthesis.getVoices()}catch(e){}markVoices()};load();
   try{speechSynthesis.addEventListener("voiceschanged",load)}catch(e){speechSynthesis.onvoiceschanged=load}}
 function sayMark(l,on){document.querySelectorAll(`.speak[data-lang="${l}"]`).forEach(b=>b.classList.toggle("saying",on))}
-function stopSay(){sayTok++;document.querySelectorAll(".saying").forEach(b=>b.classList.remove("saying"));try{hasTTS&&speechSynthesis.cancel()}catch(e){}}
+function stopSay(){sayTok++;stopRec();document.querySelectorAll(".saying").forEach(b=>b.classList.remove("saying"));try{hasTTS&&speechSynthesis.cancel()}catch(e){}}
 function utter(text,l,tok,done){
   if(!hasVoice(l)){if(!done)toast(hasTTS?`No ${LANGS[l].name} voice on this device. ${VOICE_HELP}`:"This browser cannot speak words aloud. Try Chrome, Edge or Safari.");done&&done();return}
   try{const u=new SpeechSynthesisUtterance(text),v=voiceFor(l);u.lang=LANGS[l].tts;if(v)u.voice=v;u.rate=say.slow?.6:.9;
@@ -1167,11 +1177,81 @@ function speakRow(w){if(!w)return;stopSay();const tok=sayTok,q=L.filter(hasVoice
   const next=()=>{if(tok!==sayTok)return;const l=q.shift();if(!l)return;utter(w[l].w,l,tok,next)};next()}
 const spk=(w,l)=>`<button class="speak${hasVoice(l)?"":" novoice"}" aria-label="Say in ${LANGS[l].name}" title="${hasVoice(l)?"Pronounce":`No ${LANGS[l].name} voice on this device`}" data-say="${encodeURIComponent(w)}" data-lang="${l}">▶</button>`;
 const spkAll=(w,key)=>`<button class="speak-all" data-all="${encodeURIComponent(w.key)}" title="Hear all ${L.length} languages in turn">▶ Hear all${key?"<kbd>P</kbd>":""}</button>`;
-const sayBar=w=>`<div class="saybar">${spkAll(w,true)}<label class="chk"><input type="checkbox" data-say-opt="slow" ${say.slow?"checked":""}> Slow</label><label class="chk"><input type="checkbox" data-say-opt="auto" ${say.auto?"checked":""}> Play the row when a card turns</label><p class="note" data-missing>${missingText()}</p></div>`;
+const sayBar=w=>`<div class="saybar">${spkAll(w,true)}<label class="chk"><input type="checkbox" data-say-opt="slow" ${say.slow?"checked":""}> Slow</label><label class="chk"><input type="checkbox" data-say-opt="auto" ${say.auto?"checked":""}> Play the row when a card turns</label>${SR?`<label class="chk"><input type="checkbox" data-mic-opt ${say.mic?"checked":""}> Check my pronunciation with the microphone</label>`:""}<p class="note" data-missing>${missingText()}</p>${micNote()}</div>`;
 const wordByKey=k=>allWords().find(w=>w.key===k);
 document.addEventListener("change",e=>{const o=e.target.dataset&&e.target.dataset.sayOpt;if(o){say[o]=e.target.checked;store.set("talenrij-say",say)}});
 document.addEventListener("click",e=>{const a=e.target.closest(".speak-all");if(a){e.stopPropagation();speakRow(wordByKey(decodeURIComponent(a.dataset.all)));return}
   const b=e.target.closest(".speak");if(b){e.stopPropagation();speak(decodeURIComponent(b.dataset.say),b.dataset.lang)}});
+
+// pronunciation check: the microphone listens per language in row order and the browser's speech recognition decides right or wrong
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(say.mic===undefined)say.mic=true;
+let mic=null,rec=null,micOff="";   // micOff: reason the check is unavailable this visit (blocked, offline)
+const micActive=()=>!!SR&&say.mic&&!micOff;
+const micNote=()=>!SR?`<p class="note">The pronunciation check with the microphone works in Chrome, Edge and Safari.</p>`:micOff?`<p class="note">${micOff}</p>`:say.mic?`<p class="note">The check uses your browser's speech recognition, which needs internet in Chrome and Edge. It hears whether the word comes across, not every detail of your accent.</p>`:"";
+const clean=s=>s.normalize("NFD").replace(/\p{M}/gu,"").toLowerCase().replace(/[^\p{L}\p{N}\s]/gu," ").replace(/\s+/g," ").trim();
+const CJ=new Set(["zh","ja","ko"]);
+function micTargets(w,l){const t=[w[l].w];if(l==="ja"&&w.ja.r)t.push(w.ja.r.split(" · ")[0]);
+  return t.flatMap(x=>x.split(/[\/,]/)).map(x=>x.replace(/\(.*?\)/g,"")).map(clean).filter(Boolean).map(x=>CJ.has(l)?x.replace(/ /g,""):l==="ro"?x.replace(/^a /,""):x)}
+function micMatch(w,l,heard){const ts=micTargets(w,l);
+  return heard.some(h=>{h=clean(h);if(CJ.has(l))h=h.replace(/ /g,"");if(!h)return false;
+    return ts.some(t=>h===t||(l==="ro"&&h==="a "+t)||(CJ.has(l)?h.includes(t):(" "+h+" ").includes(" "+t+" "))||(t.length>=7&&lev(h,t)<=1))})}
+function stopRec(){if(rec){const r=rec;rec=null;try{r.abort()}catch(e){}}}
+function micMount(w,next){
+  if(!mic||mic.key!==w.key||mic.row!==L.join()){
+    mic={key:w.key,row:L.join(),w,next,res:Object.fromEntries(L.map(l=>[l,{st:"wait",heard:"",tries:0}])),miss:false,msg:""};
+    drawMic();if(!say.auto)setTimeout(()=>{if(mic&&mic.key===w.key&&!rec)listen(true)},300);
+  }else{mic.next=next;drawMic()}}
+const micCur=()=>mic&&L.find(l=>!["ok","skip"].includes(mic.res[l].st));
+function listen(auto){
+  const l=micCur();if(!l||!micActive())return;
+  stopSay();stopRec();
+  const r=new SR(),m=mic,st=m.res[l];let finals=[],interim="",err="";
+  r.lang=LANGS[l].tts;r.interimResults=true;r.maxAlternatives=5;r.continuous=false;
+  r.onresult=e=>{if(m!==mic)return;interim="";finals=[];
+    for(const res of e.results){if(res.isFinal)for(const a of res)finals.push(a.transcript);else interim+=res[0].transcript}
+    st.heard=(finals[0]||interim).trim();drawMic()};
+  r.onerror=e=>{err=e.error};
+  r.onend=()=>{if(rec===r)rec=null;clearTimeout(cap);if(m!==mic)return;
+    if(err==="aborted"){st.st="wait";return drawMic()}
+    const heard=finals.length?finals:interim?[interim]:[];
+    if(err==="not-allowed"||err==="service-not-allowed"){st.st="wait";
+      if(auto){m.msg="Tap the button to start recording."}
+      else{micOff="The microphone is blocked. Allow it for this site in your browser settings, then turn the microphone check off and on again.";}}
+    else if(err==="network"){st.st="wait";micOff="Speech recognition needs an internet connection. Check by hand for now."}
+    else if(err==="language-not-supported"){st.st="skip";st.heard="";st.na=true;m.msg=`This browser cannot recognise ${LANGS[l].name}, so it is skipped.`}
+    else if(!heard.length){st.st="wait";if(err!=="aborted")m.msg="I did not hear anything. Tap to try again."}
+    else if(micMatch(m.w,l,heard)){st.st="ok";st.heard=heard.find(h=>micMatch(m.w,l,[h]))||heard[0];m.msg="";
+      if(micCur())setTimeout(()=>{if(m===mic&&!rec)listen(true)},500)}
+    else{st.st="bad";st.tries++;m.miss=true;st.heard=heard[0];m.msg=`Not quite. Listen with ▶ and say the ${LANGS[l].name} word again.`}
+    if(micOff)return render();
+    drawMic()};
+  const cap=setTimeout(()=>{try{r.stop()}catch(e){}},8000);
+  rec=r;st.st="listen";st.heard="";m.msg="";drawMic();
+  try{r.start()}catch(e){rec=null;st.st="wait";m.msg="Tap the button to start recording.";drawMic()}}
+function micDone(){if(!mic||micCur())return;const ok=!mic.miss&&!L.some(l=>mic.res[l].st==="skip"&&!mic.res[l].na);
+  const next=mic.next;stopRec();mic=null;next(ok)}
+function micSkip(){const l=micCur();if(!l)return;stopRec();mic.res[l].st="skip";mic.miss=true;mic.msg="";drawMic();if(micCur())setTimeout(()=>mic&&!rec&&listen(true),300)}
+function drawMic(){if(!mic)return;const cur=micCur();
+  L.forEach(l=>{const s=mic.res[l],el=document.querySelector(`[data-mic="${l}"]`);if(!el)return;
+    el.className="mic-res "+s.st;el.closest(".lane").classList.toggle("miccur",l===cur);
+    el.textContent=s.st==="listen"?(s.heard?`“${s.heard}”`:"Listening…"):s.st==="ok"?`✓ “${s.heard}”${s.tries?` · try ${s.tries+1}`:""}`:s.st==="bad"?`✗ heard “${s.heard}”`:s.st==="skip"?(s.na?"– not supported here":"– skipped"):l===cur?"Your turn":""});
+  const box=document.getElementById("micctl");if(!box)return;
+  if(!cur){const ok=!mic.miss&&!L.some(l=>mic.res[l].st==="skip"&&!mic.res[l].na);
+    box.innerHTML=`<p class="micsum ${ok?"ok":"bad"}">${ok?`All ${L.length} right the first time. Counts as known.`:"Some words needed another try. This word comes back sooner."}</p>
+      <div class="actions"><button class="btn primary" id="micnext">Next<kbd>space</kbd></button></div>`;
+    document.getElementById("micnext").onclick=micDone;}
+  else{const s=mic.res[cur],nm=LANGS[cur].name,listening=s.st==="listen";
+    box.innerHTML=`<div class="actions"><button class="btn primary" id="micgo">${listening?"■ Stop listening":s.st==="bad"?`🎙 Say ${nm} again`:`🎙 Say it in ${nm}`}<kbd>space</kbd></button>
+      ${s.tries>=3?`<button class="btn bad" id="micskip">Skip ${nm} (counts as not yet)</button>`:""}</div>
+      ${mic.msg?`<p class="note" role="status">${mic.msg}</p>`:""}`;
+    document.getElementById("micgo").onclick=()=>listening?(rec&&rec.stop()):listen(false);
+    const sk=document.getElementById("micskip");if(sk)sk.onclick=micSkip}}
+// Space / R while the check is on: record, stop, or go to the next card
+function micKey(e,k){if(!mic||!document.getElementById("micctl"))return false;
+  if(e.code==="Space"||k==="r"){e.preventDefault();if(!micCur())micDone();else if(rec)rec.stop();else listen(false);return true}
+  return k==="j"||k==="k"}
+document.addEventListener("change",e=>{if(e.target.dataset&&e.target.dataset.micOpt!==undefined){say.mic=e.target.checked;micOff="";store.set("talenrij-say",say);stopRec();mic=null;render()}});
 
 // helpers
 const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
@@ -1273,7 +1353,7 @@ function cardHTML(w,revealed,badge){const t=revealed?tips(w):"";
   return `${badge?`<div><span class="tag ${badge.cls}">${badge.txt}</span>${themeKey()==="all"?`<span class="tag theme-tag">${themeName(w.theme)}</span>`:""}</div>`:""}
     <div class="prompt">${w.en}</div>
     <div class="lanes">${L.map(l=>`<div class="lane" style="${cvar(l)}"><div class="lab">${LANGS[l].name}</div>
-      <div class="w ${revealed?"":"hidden-w"}">${w[l].w}${revealed?spk(w[l].w,l):""}</div>${revealed&&w[l].r?`<div class="r">${w[l].r}</div>`:""}</div>`).join("")}</div>
+      <div class="w ${revealed?"":"hidden-w"}">${w[l].w}${revealed?spk(w[l].w,l):""}</div>${revealed&&w[l].r?`<div class="r">${w[l].r}</div>`:""}${revealed&&micActive()?`<div class="mic-res" data-mic="${l}"></div>`:""}</div>`).join("")}</div>
     ${revealed?sayBar(w):""}
     ${t?`<div class="tip" style="margin:0">${t}</div>`:""}`}
 function quizHTML(q,hintTxt){const {w,target,order,done,picked}=q;
@@ -1336,10 +1416,11 @@ function renderSessCard(){
     <div class="progress"><div style="width:${sess.pos/total*100}%"></div></div>
     <div class="meta"><span>Card ${sess.pos+1} of ${total}${sess.quizLeft?` · then ${sess.quizLeft} tell-apart questions`:""}</span><span>${sess.good} right · ${sess.bad} not yet</span></div>
     ${cardHTML(it.w,sess.revealed,it.isNew?{cls:"new",txt:"New"}:sess.lapsed.has(it.w.key)?{cls:"again",txt:"Once more"}:{cls:"rev",txt:"Review"})}
-    <div class="actions">${sess.revealed?`<button class="btn good" id="yes">Knew it<kbd>J</kbd></button><button class="btn bad" id="no">Not yet<kbd>K</kbd></button>`
+    <div class="actions">${sess.revealed?(micActive()?`<div class="micctl" id="micctl"></div>`:`<button class="btn good" id="yes">Knew it<kbd>J</kbd></button><button class="btn bad" id="no">Not yet<kbd>K</kbd></button>`)
       :`<button class="btn primary" id="show">Show the ${L.length} words<kbd>space</kbd></button>`}
       <button class="btn" id="stop">Stop</button></div></div>`;
-  if(sess.revealed){document.getElementById("yes").onclick=()=>grade(true);document.getElementById("no").onclick=()=>grade(false)}
+  if(sess.revealed&&micActive())micMount(it.w,grade);
+  else if(sess.revealed){document.getElementById("yes").onclick=()=>grade(true);document.getElementById("no").onclick=()=>grade(false)}
   else document.getElementById("show").onclick=sessReveal;
   document.getElementById("stop").onclick=()=>{sess=null;render()};
 }
@@ -1415,12 +1496,13 @@ function renderFlash(){
     <div class="meta"><span>Card ${di+1} of ${deck.length}</span><span>${session.good} known · ${session.bad} practise</span></div>
     ${cardHTML(deck[di],revealed)}
     <div class="timer"><div id="tbar"></div></div>
-    <div class="actions">${revealed?`<button class="btn good" id="yes">Knew it<kbd>J</kbd></button><button class="btn bad" id="no">Not yet<kbd>K</kbd></button>`:`<button class="btn primary" id="show">Show the ${L.length} words<kbd>space</kbd></button>`}</div>
+    <div class="actions">${revealed?(micActive()?`<div class="micctl" id="micctl"></div>`:`<button class="btn good" id="yes">Knew it<kbd>J</kbd></button><button class="btn bad" id="no">Not yet<kbd>K</kbd></button>`):`<button class="btn primary" id="show">Show the ${L.length} words<kbd>space</kbd></button>`}</div>
     <div class="meta"><label class="chk"><input type="checkbox" id="auto" ${auto?"checked":""}> Turbo: flip automatically after 3 s</label><label class="chk"><input type="checkbox" id="onlynew" ${onlyNew?"checked":""}> Only words that are not solid yet</label></div>
     <p class="note">Free practice does not count towards your daily plan or review schedule.</p>
   </div>`;
   if(!revealed){document.getElementById("show").onclick=reveal;
     if(auto){const b=document.getElementById("tbar");requestAnimationFrame(()=>{b.style.transition="width 3s linear";b.style.width="100%"});autoT=setTimeout(reveal,3000)}}
+  else if(micActive())micMount(deck[di],answer);
   else{document.getElementById("yes").onclick=()=>answer(true);document.getElementById("no").onclick=()=>answer(false)}
   document.getElementById("auto").onchange=e=>{auto=e.target.checked;renderFlash()};
   document.getElementById("onlynew").onchange=e=>{onlyNew=e.target.checked;buildDeck();renderFlash()};
@@ -1454,10 +1536,10 @@ document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"||(e.target
   const k=e.key.toLowerCase();
   if(mode==="today"){
     if(!sess){if(e.code==="Space"&&document.getElementById("start")){e.preventDefault();startSession()}return}
-    if(sess.phase==="cards"){if(e.code==="Space"){e.preventDefault();sessReveal()}else if(sess.revealed&&k==="p")speakRow(sess.queue[sess.pos].w);else if(sess.revealed&&k==="j")grade(true);else if(sess.revealed&&k==="k")grade(false)}
+    if(sess.phase==="cards"){if(sess.revealed&&micKey(e,k))return;if(e.code==="Space"){e.preventDefault();sessReveal()}else if(sess.revealed&&k==="p")speakRow(sess.queue[sess.pos].w);else if(sess.revealed&&k==="j")grade(true);else if(sess.revealed&&k==="k")grade(false)}
     else if(sess.phase==="quiz"&&sess.q){const d=+e.key;if(!sess.q.done&&d>=1&&d<=L.length)sessPick(sess.q.order[d-1]);else if(sess.q.done&&e.code==="Space"){e.preventDefault();sessNext()}}
   }
-  if(mode==="flash"){if(e.code==="Space"){e.preventDefault();reveal()}else if(revealed&&k==="p")speakRow(deck[di]);else if(revealed&&k==="j")answer(true);else if(revealed&&k==="k")answer(false)}
+  if(mode==="flash"){if(revealed&&micKey(e,k))return;if(e.code==="Space"){e.preventDefault();reveal()}else if(revealed&&k==="p")speakRow(deck[di]);else if(revealed&&k==="j")answer(true);else if(revealed&&k==="k")answer(false)}
   if(mode==="quiz"&&qz){const d=+e.key;if(!qz.done&&d>=1&&d<=L.length)pick(qz.order[d-1]);else if(qz.done&&e.code==="Space"){e.preventDefault();newQ();renderQuiz()}}});
 reset();
 
