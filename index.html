@@ -1,0 +1,1532 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Talenrij</title>
+<meta name="description" content="Learn related languages side by side and grow your vocabulary fast.">
+<meta name="theme-color" content="#EEF1EC" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121815" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Talenrij">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=Be+Vietnam+Pro:wght@500;700&family=Onest:wght@500;700&family=Noto+Sans+SC:wght@500;700&family=Noto+Sans+JP:wght@500;700&family=Noto+Sans+KR:wght@500;700&display=swap">
+<style>
+/* Layout: one column workbench — closeness spectrum + language chips, mode tabs, then a row of 3–4 language lanes per word */
+:root{
+  --bg:#EEF1EC; --surface:#FBFCFA; --ink:#17211C; --muted:#5E6B64; --line:#D3DAD4;
+  --es:#B83A22; --it:#26774A; --pt:#2550A0; --fr:#8A2F6B;
+  --zh:#B02A2A; --ja:#6243A3; --ko:#16717F; --vi:#B55A12;
+  --de:#8A6410; --sv:#1E62A8; --da:#B3263A; --no:#0E7563; --en:#475569;
+  --good:#26774A; --bad:#B83A22; --focus:#6243A3;
+  --ca:#9A6B00; --ro:#0F7C8C; --ru:#B02A2A; --pl:#2550A0; --cs:#26774A; --sk:#8A6410; --id:#B83A22; --ms:#1E62A8; --tl:#6243A3;
+  --nl:#C2570C; --d1:#1E8A57; --d2:#6E8F12; --d3:#B7790A; --d4:#C2410C;
+  --f-display:"Bricolage Grotesque","Atkinson Hyperlegible",system-ui,sans-serif;
+  --f-body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  --f-vi:"Be Vietnam Pro",system-ui,sans-serif;
+  --f-ru:"Onest",system-ui,sans-serif;
+  --f-zh:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --f-ja:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-ko:"Noto Sans KR","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121815; --surface:#1A221E; --ink:#E7EDE8; --muted:#97A49C; --line:#2C3832;
+  --es:#F0805F; --it:#6CC795; --pt:#7FA6EE; --fr:#E58AC4;
+  --zh:#EE7A72; --ja:#B39AEC; --ko:#5EC3D0; --vi:#F2A15C;
+  --de:#E3BE5C; --sv:#7DB0EE; --da:#F07A88; --no:#5BD0BC; --en:#A9B8CA;
+  --nl:#F5A35C; --good:#6CC795; --bad:#F0805F; --focus:#B39AEC; --d1:#4FD18F; --d2:#B5D44A; --d3:#F2C14E; --d4:#F78C5C;
+  --ca:#E8C04F; --ro:#5CC6D4; --ru:#EE7A72; --pl:#7FA6EE; --cs:#6CC795; --sk:#E3BE5C; --id:#F0805F; --ms:#7DB0EE; --tl:#B39AEC; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121815; --surface:#1A221E; --ink:#E7EDE8; --muted:#97A49C; --line:#2C3832;
+  --es:#F0805F; --it:#6CC795; --pt:#7FA6EE; --fr:#E58AC4;
+  --zh:#EE7A72; --ja:#B39AEC; --ko:#5EC3D0; --vi:#F2A15C;
+  --de:#E3BE5C; --sv:#7DB0EE; --da:#F07A88; --no:#5BD0BC; --en:#A9B8CA;
+  --nl:#F5A35C; --good:#6CC795; --bad:#F0805F; --focus:#B39AEC; --d1:#4FD18F; --d2:#B5D44A; --d3:#F2C14E; --d4:#F78C5C;
+  --ca:#E8C04F; --ro:#5CC6D4; --ru:#EE7A72; --pl:#7FA6EE; --cs:#6CC795; --sk:#E3BE5C; --id:#F0805F; --ms:#7DB0EE; --tl:#B39AEC; color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding-block:28px 64px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:22px}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+h1{font-family:var(--f-display);font-weight:800;font-size:clamp(2.2rem,6vw,3.4rem);line-height:1;margin:0;letter-spacing:-.02em}
+.sub{margin:6px 0 0;color:var(--muted);max-width:56ch}
+.stats{font-family:var(--f-display);font-variant-numeric:tabular-nums;color:var(--muted);font-size:.9rem;text-align:right}
+.stats b{color:var(--ink);font-size:1.6rem;display:block;line-height:1}
+button{font-family:inherit}
+button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* picker */
+.picker{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:20px clamp(14px,3vw,24px);display:flex;flex-direction:column;gap:18px}
+.eyebrow{font:700 .72rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.scale{display:flex;flex-direction:column;gap:10px}
+.scale-line{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:.8rem;color:var(--muted)}
+.scale-line span.track{flex:1;height:2px;background:repeating-linear-gradient(90deg,var(--ink) 0 6px,transparent 6px 10px);opacity:.35}
+.bands{display:grid;grid-template-columns:1fr 2fr 1fr;gap:12px}
+.band{display:flex;flex-direction:column;gap:8px;min-width:0}
+.band h3{margin:0;font:700 1rem var(--f-display)}
+.band p{margin:0;font-size:.82rem;color:var(--muted)}
+.band .groups{display:flex;gap:8px;flex-wrap:wrap}
+.group{flex:1 1 140px;text-align:left;background:var(--bg);border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;cursor:pointer;color:var(--ink);min-width:0}
+.group b{font:700 1rem var(--f-display);display:block}
+.group small{display:block;color:var(--muted);font-size:.8rem;line-height:1.35;margin-top:2px}
+.group .dots{display:flex;gap:3px;margin-top:8px}.group .dots i{width:8px;height:8px;border-radius:50%}
+.group[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+@media (max-width:720px){.bands{grid-template-columns:1fr}}
+.langbar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-top:1.5px solid var(--line);padding-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--c);color:var(--c);background:transparent;border-radius:999px;padding:7px 14px;font-weight:700;font-size:.92rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--c);color:var(--surface)}
+.hint{font-size:.82rem;color:var(--muted);width:100%}
+.dist{width:100%;display:flex;flex-direction:column;gap:12px;background:var(--bg);border-radius:14px;padding:14px 16px}
+.dist-head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.dist-sum{display:flex;align-items:center;gap:10px;font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:3px 11px;font:700 .8rem var(--f-body);color:var(--surface);background:var(--d)}
+.scale4{display:flex;gap:4px;align-items:center;font-size:.75rem;color:var(--muted);flex-wrap:wrap}
+.scale4 span{display:inline-flex;align-items:center;gap:5px;margin-right:8px}
+.scale4 i{width:12px;height:12px;border-radius:3px;background:var(--d)}
+.pairs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.pair{border-left:6px solid var(--d);background:var(--surface);border-radius:8px;padding:8px 10px;min-width:0}
+.pair .names{font-weight:700;display:flex;flex-wrap:wrap;align-items:center;gap:6px}
+.pair .names b{color:var(--c)}
+.pair .lvl{font-size:.78rem;font-weight:700;color:var(--d)}
+.pair p{margin:2px 0 0;font-size:.8rem;color:var(--muted)}
+.chip .dd{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--d);margin-left:7px;vertical-align:middle;box-shadow:0 0 0 1.5px var(--surface)}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1.5px solid var(--ink);border-radius:999px;padding:3px;gap:2px;flex-wrap:wrap}
+.seg button{border:0;background:transparent;color:var(--ink);font-weight:600;font-size:.92rem;padding:8px 14px;border-radius:999px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+input[type=search]{width:100%;font:1rem var(--f-body);padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+
+/* list rows */
+.row{display:grid;grid-template-columns:150px repeat(var(--n),minmax(0,1fr));border-top:1.5px solid var(--line);padding-block:14px;gap:12px;align-items:start}
+.row:last-child{border-bottom:1.5px solid var(--line)}
+.nl{font-family:var(--f-display);font-weight:700;font-size:1.1rem;min-width:0}
+.nl small{display:block;font:400 .78rem var(--f-body);color:var(--muted);margin-top:4px}
+.meter{display:flex;gap:3px;margin-top:8px}.meter span{width:16px;height:5px;border-radius:2px;background:var(--line)}.meter span.on{background:var(--ink)}
+.cell{min-width:0;border-left:4px solid var(--c);padding-left:10px}
+.w{font-family:var(--fw,var(--f-display));font-weight:700;line-height:1.2;overflow-wrap:anywhere}
+.cell .w{font-size:1.3rem;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.r{color:var(--muted);font-size:.85rem}
+.lab{font:700 .68rem var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--c)}
+.speak{border:0;background:transparent;color:var(--c);cursor:pointer;padding:2px 4px;border-radius:6px;font-size:.95rem;line-height:1}
+.speak:hover{background:color-mix(in srgb,var(--c) 14%,transparent)}
+.speak.novoice{opacity:.35}
+.speak.saying,.speak-all.saying{background:color-mix(in srgb,var(--c,var(--ink)) 22%,transparent)}
+.speak-all{font:700 .8rem var(--f-body);border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 10px;cursor:pointer}
+.speak-all:hover{border-color:var(--ink)}
+.speak-all kbd{font:600 .68rem var(--f-body);opacity:.65;margin-left:4px;border:1px solid currentColor;border-radius:4px;padding:0 3px}
+.nl .speak-all{margin-top:8px}
+.saybar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;font-size:.85rem;color:var(--muted)}
+.saybar .note{flex-basis:100%;margin:0}
+#toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);max-width:min(92vw,520px);background:var(--ink);color:var(--bg);padding:12px 16px;border-radius:12px;font-size:.88rem;line-height:1.4;box-shadow:0 6px 24px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:opacity .2s;z-index:50}
+#toast.on{opacity:1}
+.tip{grid-column:2 / -1;font-size:.85rem;color:var(--muted);margin-top:-4px;display:flex;flex-direction:column;gap:2px}
+.root{display:inline-block;font-family:var(--f-zh);border:1px solid var(--line);border-radius:6px;padding:0 6px;margin-left:4px;color:var(--ink)}
+@media (max-width:640px){
+  .row{grid-template-columns:repeat(var(--n),minmax(0,1fr))}.nl,.tip{grid-column:1/-1}.cell .w{font-size:1.1rem}
+  .n4 .row{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* flash + quiz */
+.stage{background:var(--surface);border:1.5px solid var(--line);border-radius:18px;padding:26px clamp(16px,4vw,32px);display:flex;flex-direction:column;gap:20px}
+.prompt{font-family:var(--f-display);font-weight:800;font-size:clamp(2rem,7vw,3.2rem);line-height:1.05;text-wrap:balance;letter-spacing:-.01em}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden}.progress div{height:100%;background:var(--ink);transition:width .2s}
+.timer{height:3px}.timer div{height:100%;background:var(--focus);width:0}
+.lanes,.opts{display:grid;grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:12px}
+@media (max-width:760px){.n4 .lanes,.n4 .opts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.n3 .lanes,.n3 .opts{grid-template-columns:1fr}}
+.lane{border-top:4px solid var(--c);padding-top:10px;min-height:92px;min-width:0}
+.lane .w{font-size:1.6rem}
+.hidden-w{color:transparent;background:var(--line);border-radius:6px;user-select:none}
+.actions{display:flex;flex-wrap:wrap;gap:10px}
+.btn{font-weight:700;font-size:1rem;padding:12px 18px;border-radius:12px;border:1.5px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.good{border-color:var(--good);color:var(--good)}.btn.bad{border-color:var(--bad);color:var(--bad)}
+.btn kbd{font:600 .72rem var(--f-body);opacity:.65;margin-left:6px;border:1px solid currentColor;border-radius:4px;padding:0 4px}
+.meta{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px;color:var(--muted);font-size:.88rem;font-variant-numeric:tabular-nums}
+label.chk{display:inline-flex;gap:8px;align-items:center;cursor:pointer}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--bg);border-radius:14px;padding:16px;cursor:pointer;color:var(--ink);min-width:0}
+.opt .w{font-size:1.5rem}
+.opt.right{border-color:var(--good);box-shadow:inset 0 0 0 2px var(--good)}
+.opt.wrong{border-color:var(--bad);box-shadow:inset 0 0 0 2px var(--bad)}
+.ask{font-family:var(--f-display);font-size:1.25rem;font-weight:700}
+.ask em{font-style:normal;color:var(--c)}
+.note{font-size:.85rem;color:var(--muted)}
+/* vandaag */
+.today{gap:22px}
+.today-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px}
+.zin{display:flex;flex-direction:column;gap:10px}
+.zin-label{font-family:var(--f-display);font-weight:700;font-size:1.15rem}
+.zin-label b{margin-left:6px;padding:2px 10px;border-radius:999px;background:var(--ink);color:var(--surface);font-size:.85rem}
+input[type=range]{width:100%;accent-color:var(--ink);height:28px}
+.ticks{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.ticks span{border-top:3px solid var(--line);padding-top:6px}
+.ticks span:nth-child(2){text-align:center}.ticks span:nth-child(3){text-align:right}
+.ticks span.on{border-color:var(--ink);color:var(--ink)}
+.ticks b{display:block}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.tiles{grid-template-columns:1fr}}
+.tile{background:var(--bg);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;min-width:0}
+.tile b{font:800 2.4rem/1 var(--f-display);font-variant-numeric:tabular-nums}
+.tile span{font-weight:700;margin-top:6px}
+.tile small{color:var(--muted);font-size:.8rem}
+.adj{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.adj li{display:flex;gap:10px;align-items:flex-start;font-size:.9rem}
+.adj .arrow{flex:none;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:var(--line);color:var(--ink)}
+.adj li.up .arrow{background:var(--d1);color:var(--surface)}
+.adj li.down .arrow{background:var(--d4);color:var(--surface)}
+.lock{display:flex;flex-direction:column;gap:6px}
+.tag{display:inline-block;font:700 .72rem var(--f-body);letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:999px;border:1.5px solid currentColor}
+.tag.new{color:var(--d1)}.tag.rev{color:var(--muted)}.tag.again{color:var(--d4)}
+.stevig{color:var(--d1)}
+.btn:disabled,.seg button:disabled{opacity:.45;cursor:not-allowed}
+/* thema's */
+.themes{display:flex;flex-direction:column;gap:8px}
+.theme-strip{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:thin;scroll-snap-type:x proximity}
+.theme{flex:none;scroll-snap-align:start;display:flex;flex-direction:column;gap:6px;text-align:left;min-width:132px;background:var(--surface);border:1.5px solid var(--line);border-radius:12px;padding:9px 12px;cursor:pointer;color:var(--ink)}
+.theme b{font:700 .95rem var(--f-display);white-space:nowrap}
+.theme small{color:var(--muted);font-size:.76rem;font-variant-numeric:tabular-nums}
+.theme .mini{height:4px;border-radius:2px;background:var(--line);overflow:hidden}.theme .mini i{display:block;height:100%;background:var(--d1)}
+.theme[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--ink)}
+.theme.done b::after{content:" ✓";color:var(--d1)}
+.sec{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-top:18px;padding-bottom:6px;font-family:var(--f-display)}
+.sec h2{margin:0;font-size:1.25rem;font-weight:800}
+.sec span{font:400 .82rem var(--f-body);color:var(--muted);font-variant-numeric:tabular-nums}
+.sec+.row{border-top-color:var(--ink)}
+.tag.theme-tag{color:var(--muted);border-style:dashed;margin-left:6px}
+/* ---------- app shell: mobile tab bar, row summary, onboarding, footer */
+body{margin:0;-webkit-tap-highlight-color:transparent}
+.rowbtn,.tabbar{display:none}
+.foot{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;border-top:1.5px solid var(--line);padding-top:16px;font-size:.85rem;color:var(--muted)}
+.foot .sp{flex:1}
+.linkbtn{font:700 .85rem var(--f-body);border:1.5px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:6px 12px;cursor:pointer}
+.linkbtn:hover{border-color:var(--ink)}
+.linkbtn[hidden]{display:none}
+.offline{display:inline-flex;align-items:center;gap:6px}.offline i{width:8px;height:8px;border-radius:50%;background:var(--d1)}
+.offline.off i{background:var(--d3)}
+@media (max-width:720px){
+  .wrap{padding-top:max(14px,env(safe-area-inset-top,0px));padding-bottom:calc(88px + env(safe-area-inset-bottom,0px));gap:16px}
+  header{align-items:center;flex-wrap:nowrap}
+  h1{font-size:1.9rem}
+  .sub{display:none}
+  .stats{font-size:.72rem;max-width:18ch;line-height:1.3}.stats b{font-size:1.15rem}
+  .rowbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:10px 14px;color:var(--ink);cursor:pointer;font:inherit}
+  .rowbtn b{font:700 1rem var(--f-display)}
+  .rowbtn .ls{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:.85rem;font-weight:700;flex:1;min-width:0}
+  .rowbtn .ls span{color:var(--c)}
+  .rowbtn .chev{transition:transform .2s;font-size:.9rem;color:var(--muted)}
+  .rowbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+  .picker{display:none}.picker.open{display:flex}
+  .bar{display:none}
+  .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1.5px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
+  .tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--muted);font:700 .7rem var(--f-body);padding:6px 2px;border-radius:12px;cursor:pointer;min-height:52px}
+  .tabbar svg{width:24px;height:24px}
+  .tabbar button[aria-pressed="true"]{color:var(--ink);background:var(--bg)}
+  #toast{bottom:calc(84px + env(safe-area-inset-bottom,0px))}
+  .stage{padding:20px 16px;border-radius:16px}
+  .btn{padding:14px 18px}
+  .actions .btn{flex:1 1 auto}
+  .btn kbd,.speak-all kbd{display:none}
+}
+/* onboarding */
+.onb{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;display:flex;justify-content:center;padding:max(24px,env(safe-area-inset-top,0px)) 16px max(24px,env(safe-area-inset-bottom,0px))}
+.onb-in{width:100%;max-width:560px;display:flex;flex-direction:column;gap:20px;margin:auto 0}
+.onb-steps{display:flex;gap:6px}.onb-steps i{flex:1;height:4px;border-radius:2px;background:var(--line)}.onb-steps i.on{background:var(--ink)}
+.onb h2{font:800 clamp(2rem,8vw,2.8rem)/1.05 var(--f-display);margin:0;letter-spacing:-.02em}
+.onb p{margin:0;color:var(--muted)}
+.onb .demo{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:16px;padding:16px}
+.onb .demo .lane{min-height:0}
+.onb ul{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px}
+.onb .glist{display:flex;flex-direction:column;gap:8px}
+.onb .glist .group{flex:none;width:100%}
+.onb .band-h{font:700 .72rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.onb .actions .btn{flex:1 1 auto}
+.onb .howto{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Talenrij</h1>
+      <p class="sub">Learn related languages side by side. Every word sits next to its relatives, so you spot the patterns and remember three or four words at once.</p>
+    </div>
+    <div class="stats"><b id="knownCount">0</b>words learned solidly in this group</div>
+  </header>
+
+  <button class="rowbtn" id="rowbtn" aria-expanded="false" aria-controls="picker"></button>
+
+  <section class="picker" id="picker" aria-label="Choose your languages">
+    <div class="scale">
+      <div class="eyebrow">How close are the languages?</div>
+      <div class="scale-line"><span>very close</span><span class="track"></span><span>further apart</span></div>
+      <div class="bands" id="bands"></div>
+    </div>
+    <div class="langbar">
+      <div class="chips" id="chips"></div>
+      <div class="seg" role="group" aria-label="Number of languages">
+        <button data-n="3" aria-pressed="true">3 languages</button>
+        <button data-n="4" aria-pressed="false"></button>
+      </div>
+      <div class="hint" id="hint"></div>
+      <div class="dist" id="dist" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="Mode">
+      <button data-mode="today" aria-pressed="true">Today</button>
+      <button data-mode="flash" aria-pressed="false">Free flashcards</button>
+      <button data-mode="quiz" aria-pressed="false">Guess the language</button>
+      <button data-mode="list" aria-pressed="false">Word list</button>
+    </div>
+  </div>
+
+  <section class="themes" aria-label="Choose a theme">
+    <div class="eyebrow">Theme</div>
+    <div class="theme-strip" id="themes"></div>
+  </section>
+
+  <main id="main"></main>
+
+  <footer class="foot">
+    <span class="offline" id="netstate"><i></i><span>Works offline</span></span>
+    <span class="sp"></span>
+    <button class="linkbtn" id="installBtn" hidden>Install app</button>
+    <button class="linkbtn" id="exportBtn">Back up progress</button>
+    <button class="linkbtn" id="importBtn">Restore</button>
+    <input type="file" id="importFile" accept="application/json,.json" hidden>
+  </footer>
+</div>
+
+<nav class="tabbar" aria-label="Mode">
+  <button data-mode="today" aria-pressed="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg><span>Today</span></button>
+  <button data-mode="flash" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="14" height="18" rx="3"/><path d="M3 7v11a3 3 0 0 0 3 3"/></svg><span>Flashcards</span></button>
+  <button data-mode="quiz" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.5v.01"/></svg><span>Guess</span></button>
+  <button data-mode="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg><span>Words</span></button>
+</nav>
+
+<script>
+const LANGS={
+  es:{name:"Spanish",tts:"es-ES",hint:"ñ, ll and -ción point to Spanish"},
+  it:{name:"Italian",tts:"it-IT",hint:"double consonants and a final vowel point to Italian"},
+  pt:{name:"Portuguese",tts:"pt-PT",hint:"ã, lh, nh and -ção point to Portuguese"},
+  fr:{name:"French",tts:"fr-FR",hint:"silent final letters, é, ^ and œ point to French"},
+  de:{name:"German",tts:"de-DE",hint:"capitals, ß, z and pf point to German"},
+  sv:{name:"Swedish",tts:"sv-SE",hint:"ä and ö point to Swedish"},
+  da:{name:"Danish",tts:"da-DK",hint:"æ, ø and soft d/g/b point to Danish"},
+  no:{name:"Norwegian",tts:"nb-NO",hint:"æ, ø with hard p/t/k point to Norwegian"},
+  zh:{name:"Chinese",tts:"zh-CN",font:"var(--f-zh)",hint:"simplified characters (话, 学) with pinyin point to Chinese"},
+  ja:{name:"Japanese",tts:"ja-JP",font:"var(--f-ja)",hint:"kana (あ, ア) point to Japanese"},
+  ko:{name:"Korean",tts:"ko-KR",font:"var(--f-ko)",hint:"hangul (한) points to Korean"},
+  vi:{name:"Vietnamese",tts:"vi-VN",font:"var(--f-vi)",hint:"Latin script with stacked accents (ơ, ư, đ) points to Vietnamese"},
+  ca:{name:"Catalan",tts:"ca-ES",hint:"l·l, initial ll and words ending in a consonant point to Catalan"},
+  ro:{name:"Romanian",tts:"ro-RO",hint:"ă, â, î, ș and ț point to Romanian"},
+  ru:{name:"Russian",tts:"ru-RU",font:"var(--f-ru)",hint:"Cyrillic script is Russian"},
+  pl:{name:"Polish",tts:"pl-PL",hint:"ł, ą, ę, sz, cz and w point to Polish"},
+  cs:{name:"Czech",tts:"cs-CZ",hint:"ř, ů and ě point to Czech"},
+  sk:{name:"Slovak",tts:"sk-SK",hint:"ä, ô, ľ and ie point to Slovak"},
+  id:{name:"Indonesian",tts:"id-ID",hint:"Dutch loanwords (kantor, mobil) and besok point to Indonesian"},
+  ms:{name:"Malay",tts:"ms-MY",hint:"English loanwords and words like kereta, kawan and esok point to Malay"},
+  nl:{name:"Dutch",tts:"nl-NL",hint:"ij, oe and double vowels (aa, oo) point to Dutch"},
+  tl:{name:"Tagalog",tts:"fil-PH",hint:"ng, -um- and Spanish loanwords point to Tagalog"}
+};
+/* Tips: segments split by ¦. "xx,yy:tekst" shows only when one of those languages is in the row. */
+function parse(src,cols,extra){return src.trim().split("\n").map(l=>{const p=l.split("|");const o={key:p[0],en:p[1],tip:""};cols.forEach((c,i)=>o[c]={w:p[i+2]});o.tip=p[cols.length+2]||"";if(extra)extra(o,p);return o})}
+
+// nl (sleutel) | en | es | it | pt | fr | ca | ro | tip
+const ROM=parse(`huis|house|casa|casa|casa|maison|casa|casă|fr:French maison comes from Latin mansio, 'dwelling' (English mansion).
+water|water|agua|acqua|água|eau|aigua|apă|fr:French eau is all that is left of Latin aqua after centuries of sound loss.¦ro:Romanian often turns Latin -qu- into p: aqua → apă, quattuor → patru.
+brood|bread|pan|pane|pão|pain|pa|pâine|pt:Portuguese often drops a final n and puts a ~ on the vowel: pan → pão, mano → mão.¦ca:Catalan drops the final n: pa, mà.
+melk|milk|leche|latte|leite|lait|llet|lapte|ro:Romanian turns Latin -ct- into -pt-: lacte → lapte, nocte → noapte.
+nacht|night|noche|notte|noite|nuit|nit|noapte|es,it,pt:Latin -ct- becomes ch (ES), tt (IT), it (PT): nocte → noche / notte / noite.¦fr,ca:French and Catalan turn it into -it: nuit / nit, lait / llet.¦ro:Romanian turns it into -pt-: noapte.
+dag|day|día|giorno|dia|jour|dia|zi|it:Italian giorno comes from Latin diurnum, not from dies (English journal, journey).¦fr:French jour also comes from diurnum.¦ro:Romanian zi comes from Latin dies.
+kat|cat|gato|gatto|gato|chat|gat|pisică|fr:French ch often comes from Latin ca-: cattus → chat, caballus → cheval.¦ro:Romanian pisică is a word of its own.
+hond|dog|perro|cane|cão|chien|gos|câine|es,ca:Spanish perro and Catalan gos go their own way; the others come from Latin canis (English canine).
+boek|book|libro|libro|livro|livre|llibre|carte|ca:Catalan often turns an initial l into ll: llibre, lluna, llet.¦ro:Romanian carte comes from Latin charta, 'paper' (English chart, card).
+school|school|escuela|scuola|escola|école|escola|școală|es,pt,ca:Spanish, Portuguese and Catalan put an e before sc-: scuola → escuela / escola.¦fr:French did the same but later dropped the s: école.
+zee|sea|mar|mare|mar|mer|mar|mare|ro:Romanian mare means both sea and big.
+zon|sun|sol|sole|sol|soleil|sol|soare|Latin sol, as in English solar.
+maan|moon|luna|luna|lua|lune|lluna|lună|Latin luna, as in English lunar.
+ster|star|estrella|stella|estrela|étoile|estel|stea|fr:A French é at the start often marks a lost s: étoile = estrella, école = escola.
+boom|tree|árbol|albero|árvore|arbre|arbre|copac|ro:Romanian copac is a word of its own, probably older than Latin.
+bloem|flower|flor|fiore|flor|fleur|flor|floare|it:Latin fl- becomes fi- in Italian: florem → fiore.
+vriend|friend|amigo|amico|amigo|ami|amic|prieten|ro:Romanian prieten is a Slavic loanword.
+familie|family|familia|famiglia|família|famille|família|familie|
+vader|father|padre|padre|pai|père|pare|tată|Latin pater, as in English paternal.
+moeder|mother|madre|madre|mãe|mère|mare|mamă|ca:Watch out: Catalan mare means mother, Romanian mare means sea or big.
+broer|brother|hermano|fratello|irmão|frère|germà|frate|Spanish, Portuguese and Catalan use Latin germanus; Italian, French and Romanian use frater (English fraternal).
+hand|hand|mano|mano|mão|main|mà|mână|Latin manus, as in English manual.
+oog|eye|ojo|occhio|olho|œil|ull|ochi|es,it,pt,ca:Spanish j, Italian cchi, Portuguese lh and Catalan ll all come from Latin -cul-: oculus (English ocular).
+hoofd|head|cabeza|testa|cabeça|tête|cap|cap|it:Italian testa comes from Latin testa, 'pot shard'.¦fr:French tête comes from the same testa; the ^ marks a lost s.¦ca,ro:Catalan and Romanian cap come straight from Latin caput (English capital).
+hart|heart|corazón|cuore|coração|cœur|cor|inimă|ro:Romanian inimă comes from Latin anima, 'soul'.¦es,it,pt,fr,ca:Latin cor, as in English cordial and courage.
+rood|red|rojo|rosso|vermelho|rouge|vermell|roșu|
+wit|white|blanco|bianco|branco|blanc|blanc|alb|es,it,pt,fr,ca:Blanco, bianco, branco and blanc were borrowed from Germanic, like English blank.¦ro:Romanian alb comes from Latin albus (English album).
+zwart|black|negro|nero|preto|noir|negre|negru|
+groen|green|verde|verde|verde|vert|verd|verde|Latin viridis, as in English verdant.
+groot|big|grande|grande|grande|grand|gran|mare|ro:Romanian mare also means sea.
+klein|small|pequeño|piccolo|pequeno|petit|petit|mic|
+nieuw|new|nuevo|nuovo|novo|nouveau|nou|nou|es:Spanish often turns a stressed o into ue: novus → nuevo.
+goed|good|bueno|buono|bom|bon|bo|bun|Latin bonus, as in English bonus.
+sleutel|key|llave|chiave|chave|clé|clau|cheie|es,it,pt:Latin cl-, pl-, fl- → ll (ES), chi/pi/fi (IT), ch (PT): clavis → llave / chiave / chave.¦fr,ca:French and Catalan keep cl- and pl-: clé / clau, pluie / pluja.¦ro:Romanian turns cl- into ch- (pronounced k): cheie.
+regen|rain|lluvia|pioggia|chuva|pluie|pluja|ploaie|es,it,pt:Same pattern as key: pluvia → lluvia / pioggia / chuva.
+vol|full|lleno|pieno|cheio|plein|ple|plin|es,it,pt:Pl- again: plenus → lleno / pieno / cheio (English plenty).
+plein|square|plaza|piazza|praça|place|plaça|piață|Latin platea, as in English plaza and place.
+stad|city|ciudad|città|cidade|ville|ciutat|oraș|fr:French ville comes from villa; cité exists too.¦ro:Romanian oraș comes from Hungarian.¦es,it,pt,ca:Latin civitas, as in English city.
+vrijheid|freedom|libertad|libertà|liberdade|liberté|llibertat|libertate|Latin -tas gives -dad (ES), -tà (IT), -dade (PT), -té (FR), -tat (CA) and -tate (RO), like English -ty: liberty. Works for hundreds of words.
+venster|window|ventana|finestra|janela|fenêtre|finestra|fereastră|fr:Another ^ for a lost s: fenêtre = finestra.
+kerk|church|iglesia|chiesa|igreja|église|església|biserică|ro:Romanian biserică comes from Latin basilica.
+eten|eat|comer|mangiare|comer|manger|menjar|a mânca|it,fr,ca,ro:Mangiare, manger, menjar and mânca are all the same word.¦ro:Romanian verbs take a in front, like English to.
+drinken|drink|beber|bere|beber|boire|beure|a bea|Latin bibere, as in English beverage.
+spreken|speak|hablar|parlare|falar|parler|parlar|a vorbi|es:Latin f- becomes h- in Spanish: fabulare → hablar.¦pt:Portuguese falar keeps the f.¦it,fr,ca:Parlare, parler and parlar, as in English parliament.
+werken|work|trabajar|lavorare|trabalhar|travailler|treballar|a lucra|ro:Romanian a lucra is related to Italian lavorare.
+slapen|sleep|dormir|dormire|dormir|dormir|dormir|a dormi|Latin dormire, as in English dormitory.
+kopen|buy|comprar|comprare|comprar|acheter|comprar|a cumpăra|fr:French acheter comes from a different Latin word.
+vandaag|today|hoy|oggi|hoje|aujourd'hui|avui|azi|fr:Aujourd'hui contains old French hui, related to hoy and oggi.
+morgen|tomorrow|mañana|domani|amanhã|demain|demà|mâine|
+altijd|always|siempre|sempre|sempre|toujours|sempre|mereu|
+nu|now|ahora|adesso|agora|maintenant|ara|acum|
+kind|child|niño|bambino|criança|enfant|nen|copil|
+man|man|hombre|uomo|homem|homme|home|bărbat|es,it,pt,fr,ca:Hombre, uomo, homem, homme and home come from Latin hominem (English human).¦ro:Romanian bărbat comes from Latin barbatus, 'bearded'; om means person.
+vrouw|woman|mujer|donna|mulher|femme|dona|femeie|es,pt:Mujer and mulher come from Latin mulier.¦it,ca:Donna and dona come from domina, 'mistress' (English madonna).¦fr,ro:Femme and femeie come from femina (English feminine).
+deur|door|puerta|porta|porta|porte|porta|ușă|es:O → ue again: porta → puerta (English portal).¦ro:Romanian ușă comes from another Latin word; poartă means gate.
+tafel|table|mesa|tavolo|mesa|table|taula|masă|es,pt,ro:Mesa and masă come from Latin mensa.¦it,fr,ca:Tavolo, table and taula come from tabula, like English table.
+stoel|chair|silla|sedia|cadeira|chaise|cadira|scaun|pt,fr,ca:Cadeira, chaise and cadira come from Latin cathedra, like English chair.
+bed|bed|cama|letto|cama|lit|llit|pat|it,fr,ca:Letto, lit and llit come from Latin lectus.
+vis|fish|pez|pesce|peixe|poisson|peix|pește|es:Spanish pez is a live fish; on your plate it is pescado.
+vlees|meat|carne|carne|carne|viande|carn|carne|fr:French viande is a word of its own.¦es,it,pt,ca,ro:Latin caro, carnis, as in English carnivore.
+ei|egg|huevo|uovo|ovo|œuf|ou|ou|es:O → ue again: ovum → huevo (English oval).
+wijn|wine|vino|vino|vinho|vin|vi|vin|All from Latin vinum, like English wine.
+zout|salt|sal|sale|sal|sel|sal|sare|All from Latin sal; English salary comes from it too.
+kaas|cheese|queso|formaggio|queijo|fromage|formatge|brânză|es,pt:Queso and queijo come from Latin caseus, like English cheese.¦it,fr,ca:Formaggio, fromage and formatge come from forma, the mould cheese was made in.
+fruit|fruit|fruta|frutta|fruta|fruit|fruita|fructe|
+suiker|sugar|azúcar|zucchero|açúcar|sucre|sucre|zahăr|es,pt:Azúcar and açúcar still carry the Arabic article al-.
+groente|vegetables|verdura|verdura|legume|légume|verdura|legume|
+trein|train|tren|treno|comboio|train|tren|tren|pt:In Portugal you say comboio; in Brazil trem.
+station|station|estación|stazione|estação|gare|estació|gară|fr,ro:French gare and Romanian gară are the same word.
+straat|street|calle|strada|rua|rue|carrer|stradă|it,ro:Strada and stradă come from Latin strata, like English street.¦pt,fr:Rua and rue come from ruga, 'wrinkle'.¦es:Spanish calle comes from callis, 'path'.
+brug|bridge|puente|ponte|ponte|pont|pont|pod|es:O → ue again: ponte → puente.¦ro:Romanian pod is a Slavic loanword.
+haven|port|puerto|porto|porto|port|port|port|
+noord|north|norte|nord|norte|nord|nord|nord|
+zuid|south|sur|sud|sul|sud|sud|sud|
+oost|east|este|est|leste|est|est|est|
+west|west|oeste|ovest|oeste|ouest|oest|vest|
+auto|car|coche|macchina|carro|voiture|cotxe|mașină|it,ro:Macchina and mașină actually mean 'machine'.
+reis|trip|viaje|viaggio|viagem|voyage|viatge|călătorie|es,it,pt,fr,ca:Viaje, viaggio, viagem, voyage and viatge come from Latin viaticum, 'travel money' (English voyage).
+geld|money|dinero|soldi|dinheiro|argent|diners|bani|fr:French argent also means silver.¦it:Italian soldi comes from the Roman coin solidus.¦ro:Romanian bani is the plural of ban, a small coin.
+brief|letter|carta|lettera|carta|lettre|carta|scrisoare|ro:Watch out: Romanian carte means book.
+schrijven|write|escribir|scrivere|escrever|écrire|escriure|a scrie|All from Latin scribere, as in English scribe.
+lezen|read|leer|leggere|ler|lire|llegir|a citi|ro:Romanian a citi is a Slavic loanword.
+leren|learn|aprender|imparare|aprender|apprendre|aprendre|a învăța|
+papier|paper|papel|carta|papel|papier|paper|hârtie|it:Italian carta means paper; a letter is lettera.
+winkel|shop|tienda|negozio|loja|magasin|botiga|magazin|fr,ro:Magasin and magazin are the same word, originally Arabic, like English magazine.¦ca:Catalan botiga is related to English boutique.
+kantoor|office|oficina|ufficio|escritório|bureau|oficina|birou|fr,ro:Romanian birou comes from French bureau.
+berg|mountain|montaña|montagna|montanha|montagne|muntanya|munte|
+rivier|river|río|fiume|rio|rivière|riu|râu|it:Italian fiume comes from Latin flumen.
+hemel|sky|cielo|cielo|céu|ciel|cel|cer|All from Latin caelum, as in English celestial.
+wind|wind|viento|vento|vento|vent|vent|vânt|es:E → ie again: ventus → viento (English vent).
+sneeuw|snow|nieve|neve|neve|neige|neu|zăpadă|ro:Romanian zăpadă is a Slavic loanword.
+vuur|fire|fuego|fuoco|fogo|feu|foc|foc|All from Latin focus, 'hearth'.
+vogel|bird|pájaro|uccello|pássaro|oiseau|ocell|pasăre|it,fr,ca:Uccello, oiseau and ocell come from Latin aucellus.¦es,pt,ro:Pájaro, pássaro and pasăre come from passer, 'sparrow'.
+steen|stone|piedra|pietra|pedra|pierre|pedra|piatră|All from Latin petra, as in English petrify.
+mond|mouth|boca|bocca|boca|bouche|boca|gură|ro:Romanian gură comes from Latin gula, 'throat'.
+oor|ear|oreja|orecchio|orelha|oreille|orella|ureche|Same -cul- as in eye: auricula → oreja / orecchio / orelha / ureche.
+neus|nose|nariz|naso|nariz|nez|nas|nas|
+voet|foot|pie|piede|pé|pied|peu|picior|es:E → ie again: pede → pie (English pedal).
+arm|arm|brazo|braccio|braço|bras|braç|braț|
+tand|tooth|diente|dente|dente|dent|dent|dinte|es:E → ie again: dente → diente (English dentist).
+bloed|blood|sangre|sangue|sangue|sang|sang|sânge|
+ziek|sick|enfermo|malato|doente|malade|malalt|bolnav|it,fr,ca:Malato, malade and malalt come from Latin male habitus, 'in bad shape' (English malady).¦ro:Romanian bolnav is a Slavic loanword.
+arts|doctor|médico|medico|médico|médecin|metge|medic|
+ziekenhuis|hospital|hospital|ospedale|hospital|hôpital|hospital|spital|fr:Another ^ for a lost s: hôpital = hospital.
+jaar|year|año|anno|ano|an|any|an|es:Spanish ñ comes from nn: annus → año (English annual).
+maand|month|mes|mese|mês|mois|mes|lună|ro:Romanian lună also means moon.
+uur|hour|hora|ora|hora|heure|hora|oră|
+ochtend|morning|mañana|mattina|manhã|matin|matí|dimineață|es:Spanish mañana means both morning and tomorrow.
+gisteren|yesterday|ayer|ieri|ontem|hier|ahir|ieri|
+week|week|semana|settimana|semana|semaine|setmana|săptămână|All from Latin septimana, 'seven days'.
+een|one|uno|uno|um|un|un|unu|
+twee|two|dos|due|dois|deux|dos|doi|
+drie|three|tres|tre|três|trois|tres|trei|
+tien|ten|diez|dieci|dez|dix|deu|zece|
+honderd|hundred|cien|cento|cem|cent|cent|o sută|ro:Romanian sută is a Slavic loanword.¦es,it,pt,fr,ca:Latin centum, as in English century.
+blauw|blue|azul|blu|azul|bleu|blau|albastru|it,fr,ca:Blu, bleu and blau are Germanic, like English blue.
+geel|yellow|amarillo|giallo|amarelo|jaune|groc|galben|it,fr,ro:Giallo, jaune and galben come from Latin galbinus.
+mooi|beautiful|bonito|bello|bonito|beau|bonic|frumos|ro:Romanian frumos comes from Latin formosus, 'well-shaped'.
+warm|warm|caliente|caldo|quente|chaud|calent|cald|
+koud|cold|frío|freddo|frio|froid|fred|rece|
+oud|old|viejo|vecchio|velho|vieux|vell|vechi|All from Latin vetulus, as in English veteran.
+slecht|bad|malo|cattivo|mau|mauvais|dolent|rău|
+ja|yes|sí|sì|sim|oui|sí|da|ro:Romanian da is a Slavic loanword.
+nee|no|no|no|não|non|no|nu|
+naam|name|nombre|nome|nome|nom|nom|nume|
+woord|word|palabra|parola|palavra|mot|paraula|cuvânt|fr:French mot means word; parole is a spoken word.
+zeggen|say|decir|dire|dizer|dire|dir|a spune|
+horen|hear|oír|sentire|ouvir|entendre|sentir|a auzi|
+weten|know|saber|sapere|saber|savoir|saber|a ști|ro:Romanian a ști comes from Latin scire (English science).
+wie|who|quién|chi|quem|qui|qui|cine|
+waar|where|dónde|dove|onde|où|on|unde|
+wat|what|qué|che|que|que|què|ce|
+dank je|thank you|gracias|grazie|obrigado|merci|gràcies|mulțumesc|pt:Portuguese obrigado means 'obliged'; a woman says obrigada.
+taal|language|lengua|lingua|língua|langue|llengua|limbă|In every one of these languages it also means tongue, like Latin lingua (English linguist).
+lied|song|canción|canzone|canção|chanson|cançó|cântec|
+kunst|art|arte|arte|arte|art|art|artă|
+feest|party|fiesta|festa|festa|fête|festa|petrecere|fr:Another ^ for a lost s: fête = festa (English feast, festival).
+koning|king|rey|re|rei|roi|rei|rege|All from Latin rex, regis, as in English regal.
+oorlog|war|guerra|guerra|guerra|guerre|guerra|război|es,it,pt,fr,ca:Guerra and guerre are Germanic, related to English war.¦ro:Romanian război is a Slavic loanword.
+vrede|peace|paz|pace|paz|paix|pau|pace|
+land|country|país|paese|país|pays|país|țară|ro:Romanian țară comes from Latin terra.
+wereld|world|mundo|mondo|mundo|monde|món|lume|ro:Romanian lume comes from Latin lumen, 'light'.
+geschiedenis|history|historia|storia|história|histoire|història|istorie|
+muziek|music|música|musica|música|musique|música|muzică|`,["es","it","pt","fr","ca","ro"]);
+
+// nl (sleutel, ook de Nederlandse vorm) | en | de | sv | da | no | tip
+const GER=parse(`huis|house|Haus|hus|hus|hus|sv,da,no:Scandinavian kept the old u sound that became ou in English: hus = house.
+water|water|Wasser|vatten|vand|vann|de:German shifts t after a vowel to ss/s: water → Wasser, eat → essen.
+brood|bread|Brot|bröd|brød|brød|
+melk|milk|Milch|mjölk|mælk|melk|
+nacht|night|Nacht|natt|nat|natt|sv,da,no:Scandinavian turns -ght/-cht into a double t: night → natt / nat.
+dag|day|Tag|dag|dag|dag|de:German shifts d → t: day → Tag, daughter → Tochter, drink → trinken.
+kat|cat|Katze|katt|kat|katt|
+hond|dog|Hund|hund|hund|hund|English dog is a word of its own; the others match English hound.
+boek|book|Buch|bok|bog|bok|da:Danish often softens p/t/k after a vowel to b/d/g: bok → bog, köpa → købe.
+school|school|Schule|skola|skole|skole|sv,da,no:Scandinavian keeps the sk sound, like English school and sky.
+zon|sun|Sonne|sol|sol|sol|
+maan|moon|Mond|måne|måne|måne|sv,da,no:The å sounds like the o in English more.
+ster|star|Stern|stjärna|stjerne|stjerne|
+boom|tree|Baum|träd|træ|tre|sv,da,no:Träd, træ and tre are related to English tree.¦nl:Dutch boom is related to English beam.
+bloem|flower|Blume|blomma|blomst|blomst|English flower comes from French; the others match English bloom.
+vriend|friend|Freund|vän|ven|venn|
+vader|father|Vater|far|far|far|
+moeder|mother|Mutter|mor|mor|mor|
+broer|brother|Bruder|bror|bror|bror|
+zus|sister|Schwester|syster|søster|søster|nl:Dutch zus is short for zuster.
+hand|hand|Hand|hand|hånd|hånd|
+oog|eye|Auge|öga|øje|øye|
+hoofd|head|Kopf|huvud|hoved|hode|de:German Kopf is related to English cup.¦sv,da,no,nl:Huvud, hoved, hode and hoofd are related to English head.
+hart|heart|Herz|hjärta|hjerte|hjerte|de:German t → z: heart → Herz, ten → zehn, tide → Zeit.
+rood|red|rot|röd|rød|rød|
+wit|white|weiß|vit|hvid|hvit|da,no:Danish and Norwegian keep the old hv- spelling, like English wh-: hvid / hvit = white.
+zwart|black|schwarz|svart|sort|svart|English black is a word of its own; the others match English swarthy.
+groen|green|grün|grön|grøn|grønn|
+groot|big|groß|stor|stor|stor|English great is related to groß and groot.
+klein|small|klein|liten|lille|liten|
+nieuw|new|neu|ny|ny|ny|
+oud|old|alt|gammal|gammel|gammel|sv,da,no:Gammal / gammel just means old.
+eten|eat|essen|äta|spise|spise|da,no:Danish and Norwegian spise is related to Dutch spijs, 'food'.
+drinken|drink|trinken|dricka|drikke|drikke|sv,da,no:Scandinavian swallows the n before k: drink → dricka / drikke.
+spreken|speak|sprechen|tala|tale|snakke|sv,da:Swedish tala and Danish tale are related to English tell and tale.¦no:Norwegian snakke is everyday speech; tale also exists.
+werken|work|arbeiten|arbeta|arbejde|arbeide|de,sv,da,no:Arbeiten and arbeta are related to Dutch arbeid, 'labour'.
+slapen|sleep|schlafen|sova|sove|sove|de:German p → f: sleep → schlafen, ship → Schiff.
+kopen|buy|kaufen|köpa|købe|kjøpe|English cheap comes from the same root as kaufen and köpa.
+appel|apple|Apfel|äpple|æble|eple|de:German p → pf: apple → Apfel, pepper → Pfeffer.
+twee|two|zwei|två|to|to|
+tijd|time|Zeit|tid|tid|tid|English tide is the same word as tijd and Zeit.
+weg|way|Weg|väg|vej|vei|da,no:Danish and Norwegian often turn a g after a vowel into a y sound: vej / vei, øje / øye.
+week|week|Woche|vecka|uge|uke|
+venster|window|Fenster|fönster|vindue|vindu|da,no:Vindue and vindu come from Old Norse vindauga, 'wind eye', just like English window.
+kerk|church|Kirche|kyrka|kirke|kirke|
+sleutel|key|Schlüssel|nyckel|nøgle|nøkkel|
+stad|city|Stadt|stad|by|by|da,no:You know by from English place names like Whitby and Derby.
+vandaag|today|heute|idag|i dag|i dag|
+morgen|tomorrow|morgen|imorgon|i morgen|i morgen|English morning comes from the same root.
+altijd|always|immer|alltid|altid|alltid|
+nu|now|jetzt|nu|nu|nå|
+dank je|thank you|danke|tack|tak|takk|
+wat|what|was|vad|hvad|hva|da,no:Danish and Norwegian write a silent h, like English wh-: hvad / hva = what.
+kind|child|Kind|barn|barn|barn|sv,da,no:You may know barn from Scottish bairn.
+man|man|Mann|man|mand|mann|
+vrouw|woman|Frau|kvinna|kvinde|kvinne|sv,da,no:Kvinna and kvinde are related to English queen.
+deur|door|Tür|dörr|dør|dør|
+tafel|table|Tisch|bord|bord|bord|sv,da,no:Bord is related to English board: a plank.
+stoel|chair|Stuhl|stol|stol|stol|English stool is the same word as Stuhl and stol.
+bed|bed|Bett|säng|seng|seng|
+familie|family|Familie|familj|familie|familie|
+mens|human|Mensch|människa|menneske|menneske|
+vis|fish|Fisch|fisk|fisk|fisk|
+vlees|meat|Fleisch|kött|kød|kjøtt|English flesh is the same word as Fleisch and vlees.
+ei|egg|Ei|ägg|æg|egg|
+wijn|wine|Wein|vin|vin|vin|
+zout|salt|Salz|salt|salt|salt|de:T → z again: salt → Salz.
+kaas|cheese|Käse|ost|ost|ost|sv,da,no:Scandinavian ost is a word of its own.
+suiker|sugar|Zucker|socker|sukker|sukker|
+koffie|coffee|Kaffee|kaffe|kaffe|kaffe|
+markt|market|Markt|marknad|marked|marked|
+trein|train|Zug|tåg|tog|tog|de,sv,da:Zug, tåg and tog are related to English tug and tow.
+station|station|Bahnhof|station|station|stasjon|
+straat|street|Straße|gata|gade|gate|sv,da,no:Gata shows up in English street names like Kirkgate.
+brug|bridge|Brücke|bro|bro|bru|
+haven|harbour|Hafen|hamn|havn|havn|English haven is the same word as Hafen and havn.
+noord|north|Nord|norr|nord|nord|
+zuid|south|Süd|söder|syd|sør|
+oost|east|Ost|öster|øst|øst|
+west|west|West|väster|vest|vest|
+auto|car|Auto|bil|bil|bil|sv,da,no:Bil is short for automobil.
+reis|journey|Reise|resa|rejse|reise|
+geld|money|Geld|pengar|penge|penger|sv,da,no:Pengar is related to English penny.
+brief|letter|Brief|brev|brev|brev|
+schrijven|write|schreiben|skriva|skrive|skrive|
+lezen|read|lesen|läsa|læse|lese|
+leren|learn|lernen|lära sig|lære|lære|
+leraar|teacher|Lehrer|lärare|lærer|lærer|
+papier|paper|Papier|papper|papir|papir|
+winkel|shop|Geschäft|affär|butik|butikk|da,no:Butik is the same word as boutique.
+kantoor|office|Büro|kontor|kontor|kontor|sv,da,no:Kontor comes from Dutch kantoor.
+zee|sea|Meer|hav|hav|hav|de:German das Meer is the sea; der See is a lake.
+berg|mountain|Berg|berg|bjerg|fjell|no:Norwegian says fjell (English fell); berg mostly means rock.
+rivier|river|Fluss|flod|flod|elv|de,sv,da:Fluss and flod are related to English flow and flood.
+hemel|sky|Himmel|himmel|himmel|himmel|English sky comes from Old Norse, where it meant 'cloud'; heaven matches Himmel.
+wind|wind|Wind|vind|vind|vind|
+sneeuw|snow|Schnee|snö|sne|snø|
+vuur|fire|Feuer|eld|ild|ild|
+regen|rain|Regen|regn|regn|regn|
+vogel|bird|Vogel|fågel|fugl|fugl|English fowl is the same word as Vogel and fugl.
+steen|stone|Stein|sten|sten|stein|
+mond|mouth|Mund|mun|mund|munn|
+oor|ear|Ohr|öra|øre|øre|
+neus|nose|Nase|näsa|næse|nese|
+voet|foot|Fuß|fot|fod|fot|
+arm|arm|Arm|arm|arm|arm|
+tand|tooth|Zahn|tand|tand|tann|de:T → z again: tooth → Zahn.
+bloed|blood|Blut|blod|blod|blod|
+ziek|sick|krank|sjuk|syg|syk|de:German krank once meant weak, like English cranky.
+arts|doctor|Arzt|läkare|læge|lege|sv,da,no:Läkare and læge are related to English leech, the old word for healer.
+jaar|year|Jahr|år|år|år|
+maand|month|Monat|månad|måned|måned|
+uur|hour|Stunde|timme|time|time|da,no:Watch out: Danish and Norwegian time means hour.
+ochtend|morning|Morgen|morgon|morgen|morgen|de:German der Morgen is the morning; morgen is tomorrow.
+gisteren|yesterday|gestern|igår|i går|i går|
+een|one|eins|en|en|en|
+drie|three|drei|tre|tre|tre|
+tien|ten|zehn|tio|ti|ti|
+blauw|blue|blau|blå|blå|blå|
+geel|yellow|gelb|gul|gul|gul|
+mooi|beautiful|schön|vacker|smuk|vakker|de:German schön is related to English sheen.
+warm|warm|warm|varm|varm|varm|
+koud|cold|kalt|kall|kold|kald|
+goed|good|gut|bra|god|god|sv:Swedish bra is the everyday word; god also exists.
+slecht|bad|schlecht|dålig|dårlig|dårlig|
+vol|full|voll|full|fuld|full|
+ja|yes|ja|ja|ja|ja|
+nee|no|nein|nej|nej|nei|
+naam|name|Name|namn|navn|navn|
+woord|word|Wort|ord|ord|ord|
+zeggen|say|sagen|säga|sige|si|
+horen|hear|hören|höra|høre|høre|
+weten|know|wissen|veta|vide|vite|English wit and wise come from the same root.
+wie|who|wer|vem|hvem|hvem|
+waar|where|wo|var|hvor|hvor|
+taal|language|Sprache|språk|sprog|språk|sv,da,no:Språk and sprog are related to English speak.
+lied|song|Lied|sång|sang|sang|
+kunst|art|Kunst|konst|kunst|kunst|
+feest|party|Fest|fest|fest|fest|
+koning|king|König|kung|konge|konge|
+oorlog|war|Krieg|krig|krig|krig|
+vrede|peace|Frieden|fred|fred|fred|
+land|country|Land|land|land|land|English land is the same word.
+wereld|world|Welt|värld|verden|verden|
+geschiedenis|history|Geschichte|historia|historie|historie|
+muziek|music|Musik|musik|musik|musikk|`,["de","sv","da","no"]);
+
+// nl (sleutel) | en | zh | pinyin | ja | kana | romaji | ko | rom | vi | root | tip
+const CJK=parse(`school|school|学校|xuéxiào|学校|がっこう|gakkō|학교|hakgyo|trường học|學校|vi:Vietnamese trường học = 場學; 學 sounds like học.
+student|student|学生|xuésheng|学生|がくせい|gakusei|학생|haksaeng|học sinh|學生|
+universiteit|university|大学|dàxué|大学|だいがく|daigaku|대학|daehak|đại học|大學|
+bibliotheek|library|图书馆|túshūguǎn|図書館|としょかん|toshokan|도서관|doseogwan|thư viện|圖書館 (ZH·JA·KO)|vi:Vietnamese thư viện = 書院, a different combination.
+leraar|teacher|老师|lǎoshī|先生|せんせい|sensei|선생님|seonsaengnim|giáo viên|先生 (JA·KO)|ja,ko:Japanese and Korean share 先生; Chinese uses 老师.¦vi:Vietnamese giáo viên = 教員.
+ziekenhuis|hospital|医院|yīyuàn|病院|びょういん|byōin|병원|byeongwon|bệnh viện|病院 (JA·KO·VI)|
+arts|doctor|医生|yīshēng|医者|いしゃ|isha|의사|uisa|bác sĩ|醫 (ZH·JA·KO)|vi:Vietnamese bác sĩ = 博士.
+bank|bank|银行|yínháng|銀行|ぎんこう|ginkō|은행|eunhaeng|ngân hàng|銀行|The character 行 sounds like háng, kō, haeng and hàng.
+telefoon|telephone|电话|diànhuà|電話|でんわ|denwa|전화|jeonhwa|điện thoại|電話|
+krant|newspaper|报纸|bàozhǐ|新聞|しんぶん|shinbun|신문|sinmun|báo|新聞 (JA·KO)|zh:In Chinese 新闻 means 'news', not newspaper.
+auto|car|汽车|qìchē|自動車|じどうしゃ|jidōsha|자동차|jadongcha|ô tô|自動車 (JA·KO)|vi:Vietnamese ô tô comes from French auto.
+luchthaven|airport|机场|jīchǎng|空港|くうこう|kūkō|공항|gonghang|sân bay|空港 (JA·KO)|vi:Vietnamese sân bay is a word of its own: 'flying field'.
+familie|family|家人|jiārén|家族|かぞく|kazoku|가족|gajok|gia đình|家族 (JA·KO)|vi:Vietnamese gia đình = 家庭.
+tijd|time|时间|shíjiān|時間|じかん|jikan|시간|sigan|thời gian|時間|
+wereld|world|世界|shìjiè|世界|せかい|sekai|세계|segye|thế giới|世界|
+land / staat|country / state|国家|guójiā|国家|こっか|kokka|국가|gukga|quốc gia|國家|
+cultuur|culture|文化|wénhuà|文化|ぶんか|bunka|문화|munhwa|văn hóa|文化|
+economie|economy|经济|jīngjì|経済|けいざい|keizai|경제|gyeongje|kinh tế|經濟|
+geschiedenis|history|历史|lìshǐ|歴史|れきし|rekishi|역사|yeoksa|lịch sử|歷史|
+vraag / probleem|question / problem|问题|wèntí|問題|もんだい|mondai|문제|munje|vấn đề|問題|
+taal|language|语言|yǔyán|言語|げんご|gengo|언어|eoneo|ngôn ngữ|言語|zh:Chinese swaps the characters: 语言 versus 言語.
+bedrijf|company|公司|gōngsī|会社|かいしゃ|kaisha|회사|hoesa|công ty|會社 (JA·KO)|vi:Vietnamese công ty = 公司, just like Chinese.
+markt|market|市场|shìchǎng|市場|いちば|ichiba|시장|sijang|chợ|市場 (ZH·JA·KO)|vi:Vietnamese chợ is a word of its own.
+wetenschap|science|科学|kēxué|科学|かがく|kagaku|과학|gwahak|khoa học|科學|
+film|film|电影|diànyǐng|映画|えいが|eiga|영화|yeonghwa|phim|映畫 (JA·KO)|vi:Vietnamese phim comes from French film.
+muziek|music|音乐|yīnyuè|音楽|おんがく|ongaku|음악|eumak|âm nhạc|音樂|
+sport / beweging|sport / exercise|运动|yùndòng|運動|うんどう|undō|운동|undong|vận động|運動|vi:For sport, Vietnamese usually says thể thao.
+woordenboek|dictionary|词典|cídiǎn|辞書|じしょ|jisho|사전|sajeon|từ điển|辭 (all)|
+restaurant|restaurant|餐厅|cāntīng|レストラン|レストラン|resutoran|식당|sikdang|nhà hàng|—|ja:Japanese borrows from English here.
+maandag|Monday|星期一|xīngqīyī|月曜日|げつようび|getsuyōbi|월요일|woryoil|thứ hai|月曜日 (JA·KO)|ja,ko:Japanese and Korean name the days after the moon, fire, water…¦vi:Vietnamese thứ hai means 'the second'.
+oost|east|东|dōng|東|ひがし|higashi|동|dong|đông|東|ja:Japanese reads it alone as higashi, in compounds as tō (東京 = Tōkyō).
+zuid|south|南|nán|南|みなみ|minami|남|nam|nam|南|vi:Nam is also in Việt Nam.
+berg|mountain|山|shān|山|やま|yama|산|san|núi|山 (ZH·JA·KO)|vi:Vietnamese núi is a word of its own; sơn (山) shows up in names.
+drie|three|三|sān|三|さん|san|삼|sam|ba|三 (ZH·JA·KO)|Sino numbers sound almost the same: sān / san / sam.¦vi:Vietnamese counts with native words; tam (三) also exists.
+tien|ten|十|shí|十|じゅう|jū|십|sip|mười|十 (ZH·JA·KO)|vi:Thập (十) also exists in Vietnamese.
+water|water|水|shuǐ|水|みず|mizu|물|mul|nước|水 (ZH·JA)|ko:Korean uses the native word 물; 水 (su) only appears in compounds.
+mens|person|人|rén|人|ひと|hito|사람|saram|người|人 (ZH·JA)|
+vriend|friend|朋友|péngyou|友達|ともだち|tomodachi|친구|chingu|bạn|—|Different words.¦ko:Korean 친구 comes from 親舊.
+weer|weather|天气|tiānqì|天気|てんき|tenki|날씨|nalssi|thời tiết|天氣 (ZH·JA)|vi:Vietnamese thời tiết = 時節.
+koffie|coffee|咖啡|kāfēi|コーヒー|コーヒー|kōhī|커피|keopi|cà phê|—|All of them imitate the sound of coffee or café.
+dank je|thank you|谢谢|xièxie|ありがとう|ありがとう|arigatō|감사합니다|gamsahamnida|cảm ơn|—|ko:Korean 감사 is 感謝.¦vi:Vietnamese cảm ơn = 感恩.
+vader|father|父亲|fùqīn|父|ちち|chichi|아버지|abeoji|cha|父 (ZH·JA)|ko:Sino-Korean 부친 (父親) is the formal form.
+moeder|mother|母亲|mǔqīn|母|はは|haha|어머니|eomeoni|mẹ|母 (ZH·JA)|ko:Sino-Korean 모친 (母親) is the formal form.
+kind|child|孩子|háizi|子供|こども|kodomo|아이|ai|trẻ em|子 (ZH·JA)|
+huis|house|家|jiā|家|いえ|ie|집|jip|nhà|家 (ZH·JA)|vi:Gia (家) shows up in gia đình, family.
+poort / deur|gate / door|门|mén|門|もん|mon|문|mun|cửa|門 (ZH·JA·KO)|ja:Japanese 門 is a gate; an ordinary door is ドア.
+man|man|男人|nánrén|男性|だんせい|dansei|남자|namja|đàn ông|男 (ZH·JA·KO)|
+vrouw|woman|女人|nǚrén|女性|じょせい|josei|여자|yeoja|phụ nữ|女 (all)|vi:Vietnamese phụ nữ = 婦女.
+vis|fish|鱼|yú|魚|さかな|sakana|생선|saengseon|cá|魚 (ZH·JA)|ko:Korean 생선 = 生鮮, fish as food.
+vlees|meat|肉|ròu|肉|にく|niku|고기|gogi|thịt|肉 (ZH·JA)|
+rijst|rice|米饭|mǐfàn|ご飯|ごはん|gohan|밥|bap|cơm|飯 (ZH·JA)|ja:Japanese ご飯 also means meal.
+thee|tea|茶|chá|お茶|おちゃ|ocha|차|cha|trà|茶 (all)|Almost the same everywhere: chá, cha, trà.
+melk|milk|牛奶|niúnǎi|牛乳|ぎゅうにゅう|gyūnyū|우유|uyu|sữa|乳 (ZH·JA·KO)|ko:Korean 우유 = 牛乳.
+groente|vegetables|蔬菜|shūcài|野菜|やさい|yasai|채소|chaeso|rau|菜 (ZH·JA·KO)|ko:Korean 채소 = 菜蔬.
+eten|eat|吃|chī|食べる|たべる|taberu|먹다|meokda|ăn|—|ja,ko:The shared 食事 / 식사 (shokuji / siksa) means meal.
+station|station|车站|chēzhàn|駅|えき|eki|역|yeok|ga|驛 (JA·KO)|ko:Korean 역 = 驛, the old form of 駅.¦vi:Vietnamese ga comes from French gare.
+trein|train|火车|huǒchē|電車|でんしゃ|densha|기차|gicha|tàu hỏa|車 (ZH·JA·KO)|ko:Korean 기차 = 汽車.¦vi:Hỏa (火) is fire: a 'fire vehicle'.
+reis|trip|旅行|lǚxíng|旅行|りょこう|ryokō|여행|yeohaeng|du lịch|旅行 (ZH·JA·KO)|vi:Vietnamese du lịch = 遊歷.
+hotel|hotel|酒店|jiǔdiàn|ホテル|ホテル|hoteru|호텔|hotel|khách sạn|—|vi:Vietnamese khách sạn = 客棧, 'guest inn'.
+noord|north|北|běi|北|きた|kita|북|buk|bắc|北|
+west|west|西|xī|西|にし|nishi|서|seo|tây|西|
+weg|road|道路|dàolù|道路|どうろ|dōro|도로|doro|đường|道路 (ZH·JA·KO)|
+stad|city|城市|chéngshì|都市|とし|toshi|도시|dosi|thành phố|市 (ZH·JA·KO)|
+werk|work|工作|gōngzuò|仕事|しごと|shigoto|일|il|công việc|工 (ZH·VI)|vi:Vietnamese công (工) and việc together: 'work matter'.
+geld|money|钱|qián|お金|おかね|okane|돈|don|tiền|錢 (ZH·VI)|vi:Vietnamese tiền = 錢.
+zee|sea|海|hǎi|海|うみ|umi|바다|bada|biển|海 (ZH·JA)|vi:Hải (海) shows up in the city name Hải Phòng.
+rivier|river|江|jiāng|川|かわ|kawa|강|gang|sông|江 (ZH·KO)|vi:Vietnamese sông is related to 江.
+zon|sun|太阳|tàiyáng|太陽|たいよう|taiyō|태양|taeyang|mặt trời|太陽 (ZH·JA·KO)|vi:Mặt trời literally means 'face of the sky'.
+maan|moon|月亮|yuèliang|月|つき|tsuki|달|dal|mặt trăng|月 (ZH·JA)|
+bloem|flower|花|huā|花|はな|hana|꽃|kkot|hoa|花 (ZH·JA·VI)|vi:Vietnamese hoa = 花.
+boom|tree|树|shù|木|き|ki|나무|namu|cây|—|
+regen|rain|雨|yǔ|雨|あめ|ame|비|bi|mưa|雨 (ZH·JA)|
+sneeuw|snow|雪|xuě|雪|ゆき|yuki|눈|nun|tuyết|雪 (ZH·JA·VI)|vi:Vietnamese tuyết = 雪.¦ko:Korean 눈 also means eye.
+vuur|fire|火|huǒ|火|ひ|hi|불|bul|lửa|火 (ZH·JA)|
+hoofd|head|头|tóu|頭|あたま|atama|머리|meori|đầu|頭 (ZH·JA·VI)|vi:Vietnamese đầu = 頭.
+hand|hand|手|shǒu|手|て|te|손|son|tay|手 (ZH·JA)|
+oog|eye|眼睛|yǎnjing|目|め|me|눈|nun|mắt|—|
+mond|mouth|嘴|zuǐ|口|くち|kuchi|입|ip|miệng|—|zh:The character 口 (kǒu) also means mouth in Chinese, but zuǐ is more common.
+hart|heart|心脏|xīnzàng|心臓|しんぞう|shinzō|심장|simjang|tim|心臟 (ZH·JA·KO)|
+medicijn|medicine|药|yào|薬|くすり|kusuri|약|yak|thuốc|藥 (ZH·JA·KO)|
+ziekte|illness|病|bìng|病気|びょうき|byōki|병|byeong|bệnh|病 (all)|The same 病 is in 病院 / 병원 / bệnh viện (hospital).
+jaar|year|年|nián|年|とし|toshi|해|hae|năm|年 (ZH·JA·VI)|vi:Vietnamese năm belongs with 年.
+maand|month|月|yuè|月|つき|tsuki|달|dal|tháng|月 (ZH·JA)|Same character and word as moon.
+dag|day|天|tiān|日|ひ|hi|날|nal|ngày|—|
+vandaag|today|今天|jīntiān|今日|きょう|kyō|오늘|oneul|hôm nay|今 (ZH·JA)|
+morgen|tomorrow|明天|míngtiān|明日|あした|ashita|내일|naeil|ngày mai|明 (ZH·JA)|ko:Korean 내일 = 來日, 'the coming day'.
+een|one|一|yī|一|いち|ichi|일|il|một|一 (ZH·JA·KO)|Sino numbers: yī / ichi / il.
+twee|two|二|èr|二|に|ni|이|i|hai|二 (ZH·JA·KO)|
+honderd|hundred|百|bǎi|百|ひゃく|hyaku|백|baek|trăm|百 (all)|
+uur|hour|小时|xiǎoshí|時間|じかん|jikan|시간|sigan|giờ|時 (ZH·JA·KO)|Japanese and Korean use the same word as for time.
+rood|red|红|hóng|赤|あか|aka|빨간색|ppalgansaek|đỏ|—|
+wit|white|白|bái|白|しろ|shiro|흰색|huinsaek|trắng|白 (ZH·JA)|
+zwart|black|黑|hēi|黒|くろ|kuro|검은색|geomeunsaek|đen|黑 (ZH·JA)|
+blauw|blue|蓝|lán|青|あお|ao|파란색|paransaek|xanh|—|vi:Vietnamese xanh is both blue and green.
+groot|big|大|dà|大きい|おおきい|ōkii|크다|keuda|lớn|大 (ZH·JA)|The character 大 is also in 大学 / 대학 / đại học.
+klein|small|小|xiǎo|小さい|ちいさい|chiisai|작다|jakda|nhỏ|小 (ZH·JA)|
+nieuw|new|新|xīn|新しい|あたらしい|atarashii|새롭다|saeropda|mới|新 (ZH·JA)|ja,ko:The same 新 is in 新聞 / 신문 (newspaper).
+goed|good|好|hǎo|良い|よい|yoi|좋다|jota|tốt|—|
+mooi|beautiful|漂亮|piàoliang|きれい|きれい|kirei|예쁘다|yeppeuda|đẹp|—|
+kleur|colour|颜色|yánsè|色|いろ|iro|색|saek|màu|色 (ZH·JA·KO)|
+ja|yes|是|shì|はい|はい|hai|네|ne|vâng|—|
+nee|no|不|bù|いいえ|いいえ|iie|아니요|aniyo|không|—|vi:Vietnamese không = 空, 'empty'.
+naam|name|名字|míngzi|名前|なまえ|namae|이름|ireum|tên|名 (ZH·JA)|
+woord|word|单词|dāncí|単語|たんご|tango|단어|daneo|từ|單 (ZH·JA·KO)|vi:Vietnamese từ = 詞, like the second character of dāncí.
+spreken|speak|说|shuō|話す|はなす|hanasu|말하다|malhada|nói|—|ja:The 話 in 話す is also in 電話 (telephone).
+weten|know|知道|zhīdào|知る|しる|shiru|알다|alda|biết|知 (ZH·JA)|
+wat|what|什么|shénme|何|なに|nani|무엇|mueot|gì|—|
+kunst|art|艺术|yìshù|芸術|げいじゅつ|geijutsu|예술|yesul|nghệ thuật|藝術|
+koning|king|王|wáng|王|おう|ō|왕|wang|vua|王 (ZH·JA·KO)|vi:Vương (王) shows up in names and titles.
+oorlog|war|战争|zhànzhēng|戦争|せんそう|sensō|전쟁|jeonjaeng|chiến tranh|戰爭|
+vrede|peace|和平|hépíng|平和|へいわ|heiwa|평화|pyeonghwa|hòa bình|和平|ja,ko:Japanese and Korean swap the characters: 平和 / 평화.
+vrijheid|freedom|自由|zìyóu|自由|じゆう|jiyū|자유|jayu|tự do|自由|
+politiek|politics|政治|zhèngzhì|政治|せいじ|seiji|정치|jeongchi|chính trị|政治|`,[],(o,p)=>{
+  o.zh={w:p[2],r:p[3]};o.ja={w:p[4],r:(p[5]!==p[4]?p[5]+" · ":"")+p[6]};o.ko={w:p[7],r:p[8]};o.vi={w:p[9]};o.root=p[10];o.tip=p[11]||""});
+
+// nl (sleutel) | en | ru | transcriptie | pl | cs | sk | tip
+const SLA=parse(`water|water|вода|voda|woda|voda|voda|ru:Russian writes вода; the unstressed o sounds like a: vadá.¦pl:Polish w sounds like v: woda = voda.
+huis|house|дом|dom|dom|dům|dom|cs:Czech ů sounds like a long oo: dům. Latin domus, as in English domestic.
+brood|bread|хлеб|khleb|chleb|chléb|chlieb|Russian х and Polish/Czech ch are the same sound as in Scottish loch.
+melk|milk|молоко|moloko|mleko|mléko|mlieko|ru:Russian often turns ml- into molo-: moloko versus mleko. See also head.
+nacht|night|ночь|noch'|noc|noc|noc|
+dag|day|день|den'|dzień|den|deň|
+kat|cat|кошка|koshka|kot|kočka|mačka|sk:Slovak mačka is a word of its own.
+hond|dog|собака|sobaka|pies|pes|pes|ru:Russian sobaka is a loanword; the others come from Slavic pьsъ.
+boek|book|книга|kniga|książka|kniha|kniha|cs,sk:Czech and Slovak turn g into h: kniga → kniha.
+school|school|школа|shkola|szkoła|škola|škola|All from Latin schola. Polish sz = Czech š = Russian ш, like English sh.
+zee|sea|море|more|morze|moře|more|cs:Czech ř is an r and a zh at the same time, as in Dvořák.¦Related to English marine.
+zon|sun|солнце|solntse|słońce|slunce|slnko|
+maan|moon|луна|luna|księżyc|měsíc|mesiac|ru:Russian luna comes from Latin.¦cs,sk:Czech měsíc and Slovak mesiac also mean 'month'.
+ster|star|звезда|zvezda|gwiazda|hvězda|hviezda|cs,sk:G → h again: gwiazda → hvězda / hviezda.
+boom|tree|дерево|derevo|drzewo|strom|strom|cs,sk:Czech and Slovak strom is a word of its own.
+bloem|flower|цветок|tsvetok|kwiat|květina|kvet|All from the same root kvet-; Russian ц sounds like ts.
+vriend|friend|друг|drug|przyjaciel|přítel|priateľ|ru:Russian drug means friend, not drugs.
+familie|family|семья|sem'ya|rodzina|rodina|rodina|pl,cs,sk:Rodina belongs with rod, 'kin', as in rodić (to be born).
+vader|father|отец|otets|ojciec|otec|otec|
+moeder|mother|мать|mat'|matka|matka|matka|Related to English mother.
+broer|brother|брат|brat|brat|bratr|brat|Related to English brother.
+zus|sister|сестра|sestra|siostra|sestra|sestra|Related to English sister.
+hand|hand|рука|ruka|ręka|ruka|ruka|pl:Polish ę is a nasal e: ręka.
+oog|eye|глаз|glaz|oko|oko|oko|ru:Russian glaz is a word of its own; oko is in okno (window).
+hoofd|head|голова|golova|głowa|hlava|hlava|ru:Same pattern as milk: golova versus głowa.¦cs,sk:G → h again: głowa → hlava.
+hart|heart|сердце|serdtse|serce|srdce|srdce|cs,sk:Czech and Slovak can build words without a vowel: srdce.
+rood|red|красный|krasnyy|czerwony|červený|červený|ru:Russian krasnyy used to mean 'beautiful': Red Square is also Beautiful Square.
+wit|white|белый|belyy|biały|bílý|biely|
+zwart|black|чёрный|chyornyy|czarny|černý|čierny|Polish cz = Czech and Slovak č = Russian ч, like English ch.
+groen|green|зелёный|zelyonyy|zielony|zelený|zelený|
+groot|big|большой|bol'shoy|duży|velký|veľký|cs,sk:Velký is related to Russian velikiy, 'great'.
+klein|small|маленький|malen'kiy|mały|malý|malý|pl:Polish ł sounds like an English w: mały.
+nieuw|new|новый|novyy|nowy|nový|nový|Related to English new and Latin novus.
+oud|old|старый|staryy|stary|starý|starý|
+goed|good|хороший|khoroshiy|dobry|dobrý|dobrý|ru:Russian khoroshiy is a word of its own; dobryy means 'kind-hearted'.
+eten|eat|есть|yest'|jeść|jíst|jesť|
+drinken|drink|пить|pit'|pić|pít|piť|
+spreken|speak|говорить|govorit'|mówić|mluvit|hovoriť|ru,sk:Russian govorit' and Slovak hovoriť are the same word, with g → h.
+werken|work|работать|rabotat'|pracować|pracovat|pracovať|ru,cs:Rabota and práce gave us the word robot (via Czech robota, 'forced labour').
+slapen|sleep|спать|spat'|spać|spát|spať|
+vandaag|today|сегодня|segodnya|dzisiaj|dnes|dnes|
+morgen|tomorrow|завтра|zavtra|jutro|zítra|zajtra|
+nu|now|сейчас|seychas|teraz|teď|teraz|pl,sk:Polish and Slovak teraz are the same word.
+stad|city|город|gorod|miasto|město|mesto|ru:Russian gorod is in Novgorod; miasto and město actually mean 'place'.
+weg|road|дорога|doroga|droga|cesta|cesta|
+tijd|time|время|vremya|czas|čas|čas|
+taal|language|язык|yazyk|język|jazyk|jazyk|In all four it also means 'tongue'.
+venster|window|окно|okno|okno|okno|okno|The same word in all four, derived from oko (eye).
+appel|apple|яблоко|yabloko|jabłko|jablko|jablko|Related to English apple.
+twee|two|два|dva|dwa|dva|dva|Related to English two and Latin duo.
+drie|three|три|tri|trzy|tři|tri|Related to English three.
+ja|yes|да|da|tak|ano|áno|pl:Polish tak means yes; Czech tak means 'so'.
+dank je|thank you|спасибо|spasibo|dziękuję|děkuji|ďakujem|ru:Spasibo comes from 'God save'.¦pl,cs,sk:Dziękuję and děkuji are related to German danke and English thank.
+kind|child|ребёнок|rebyonok|dziecko|dítě|dieťa|
+man|man|мужчина|muzhchina|mężczyzna|muž|muž|
+vrouw|woman|женщина|zhenshchina|kobieta|žena|žena|pl:Polish kobieta is a word of its own; żona means wife.
+deur|door|дверь|dver'|drzwi|dveře|dvere|Related to English door.
+tafel|table|стол|stol|stół|stůl|stôl|Watch out: stol means table, not stool.
+stoel|chair|стул|stul|krzesło|židle|stolička|ru:Russian stul comes from German Stuhl, like English stool.
+bed|bed|кровать|krovat'|łóżko|postel|posteľ|
+sleutel|key|ключ|klyuch|klucz|klíč|kľúč|
+mens|person|человек|chelovek|człowiek|člověk|človek|
+vis|fish|рыба|ryba|ryba|ryba|ryba|The same word in all four.
+vlees|meat|мясо|myaso|mięso|maso|mäso|
+ei|egg|яйцо|yaytso|jajko|vejce|vajce|
+wijn|wine|вино|vino|wino|víno|víno|
+zout|salt|соль|sol'|sól|sůl|soľ|Related to English salt.
+kaas|cheese|сыр|syr|ser|sýr|syr|
+suiker|sugar|сахар|sakhar|cukier|cukr|cukor|
+koffie|coffee|кофе|kofe|kawa|káva|káva|
+kopen|buy|купить|kupit'|kupić|koupit|kúpiť|Related to English cheap and German kaufen.
+markt|market|рынок|rynok|rynek|trh|trh|ru,pl:Rynok and rynek come from German Ring.
+trein|train|поезд|poyezd|pociąg|vlak|vlak|
+station|station|вокзал|vokzal|dworzec|nádraží|stanica|ru:Russian vokzal probably comes from Vauxhall, a place near London.
+straat|street|улица|ulitsa|ulica|ulice|ulica|
+brug|bridge|мост|most|most|most|most|The same word in all four.
+haven|harbour|порт|port|port|přístav|prístav|
+noord|north|север|sever|północ|sever|sever|pl:Polish północ also means midnight.
+zuid|south|юг|yug|południe|jih|juh|pl:Polish południe also means midday.
+oost|east|восток|vostok|wschód|východ|východ|Vladivostok means 'ruler of the east'.
+west|west|запад|zapad|zachód|západ|západ|
+auto|car|машина|mashina|samochód|auto|auto|
+kerk|church|церковь|tserkov'|kościół|kostel|kostol|
+geld|money|деньги|den'gi|pieniądze|peníze|peniaze|pl,cs,sk:Pieniądze and peníze are related to English penny.
+brief|letter|письмо|pis'mo|list|dopis|list|
+schrijven|write|писать|pisat'|pisać|psát|písať|
+lezen|read|читать|chitat'|czytać|číst|čítať|
+leren|learn|учить|uchit'|uczyć się|učit se|učiť sa|
+leraar|teacher|учитель|uchitel'|nauczyciel|učitel|učiteľ|
+papier|paper|бумага|bumaga|papier|papír|papier|
+winkel|shop|магазин|magazin|sklep|obchod|obchod|
+kantoor|office|офис|ofis|biuro|kancelář|kancelária|
+berg|mountain|гора|gora|góra|hora|hora|cs,sk:G → h again: gora → hora.
+rivier|river|река|reka|rzeka|řeka|rieka|
+hemel|sky|небо|nebo|niebo|nebe|nebo|
+wind|wind|ветер|veter|wiatr|vítr|vietor|
+sneeuw|snow|снег|sneg|śnieg|sníh|sneh|Related to English snow.
+vuur|fire|огонь|ogon'|ogień|oheň|oheň|
+regen|rain|дождь|dozhd'|deszcz|déšť|dážď|
+vogel|bird|птица|ptitsa|ptak|pták|vták|
+steen|stone|камень|kamen'|kamień|kámen|kameň|
+mond|mouth|рот|rot|usta|ústa|ústa|
+oor|ear|ухо|ukho|ucho|ucho|ucho|
+neus|nose|нос|nos|nos|nos|nos|The same word in all four, related to English nose.
+been|leg|нога|noga|noga|noha|noha|cs,sk:G → h again: noga → noha.
+tand|tooth|зуб|zub|ząb|zub|zub|
+bloed|blood|кровь|krov'|krew|krev|krv|sk:Slovak krv has no vowel, just like srdce.
+ziek|sick|больной|bol'noy|chory|nemocný|chorý|
+arts|doctor|врач|vrach|lekarz|lékař|lekár|
+ziekenhuis|hospital|больница|bol'nitsa|szpital|nemocnice|nemocnica|
+jaar|year|год|god|rok|rok|rok|
+maand|month|месяц|mesyats|miesiąc|měsíc|mesiac|
+uur|hour|час|chas|godzina|hodina|hodina|ru:Russian chas means hour; czas and čas mean time in the other languages.
+week|week|неделя|nedelya|tydzień|týden|týždeň|ru:Russian nedelya means week; Polish niedziela is Sunday.
+ochtend|morning|утро|utro|rano|ráno|ráno|
+gisteren|yesterday|вчера|vchera|wczoraj|včera|včera|
+een|one|один|odin|jeden|jeden|jeden|
+tien|ten|десять|desyat'|dziesięć|deset|desať|
+blauw|blue|синий|siniy|niebieski|modrý|modrý|
+geel|yellow|жёлтый|zhyoltyy|żółty|žlutý|žltý|
+mooi|beautiful|красивый|krasivyy|piękny|krásný|pekný|
+warm|warm|тёплый|tyoplyy|ciepły|teplý|teplý|
+koud|cold|холодный|kholodnyy|zimny|studený|studený|
+slecht|bad|плохой|plokhoy|zły|špatný|zlý|
+nee|no|нет|net|nie|ne|nie|
+naam|name|имя|imya|imię|jméno|meno|Related to English name.
+woord|word|слово|slovo|słowo|slovo|slovo|
+zeggen|say|сказать|skazat'|powiedzieć|říct|povedať|
+horen|hear|слышать|slyshat'|słyszeć|slyšet|počuť|
+weten|know|знать|znat'|wiedzieć|vědět|vedieť|
+wie|who|кто|kto|kto|kdo|kto|
+waar|where|где|gde|gdzie|kde|kde|
+wat|what|что|chto|co|co|čo|
+lied|song|песня|pesnya|piosenka|píseň|pieseň|
+kunst|art|искусство|iskusstvo|sztuka|umění|umenie|
+feest|holiday|праздник|prazdnik|święto|svátek|sviatok|
+koning|king|король|korol'|król|král|kráľ|Derived from the name Charles (Karl), after Charlemagne.
+oorlog|war|война|voyna|wojna|válka|vojna|
+vrede|peace|мир|mir|pokój|mír|mier|ru:Russian mir means both peace and world.¦pl:Polish pokój also means room.
+land|country|страна|strana|kraj|země|krajina|
+wereld|world|мир|mir|świat|svět|svet|
+geschiedenis|history|история|istoriya|historia|dějiny|dejiny|
+muziek|music|музыка|muzyka|muzyka|hudba|hudba|`,[],(o,p)=>{
+  o.ru={w:p[2],r:p[3]};o.pl={w:p[4]};o.cs={w:p[5]};o.sk={w:p[6]};o.tip=p[7]||""});
+
+// nl (sleutel) | en | id | ms | tl | tip
+const AUS=parse(`huis|house|rumah|rumah|bahay|
+water|water|air|air|tubig|
+brood|bread|roti|roti|tinapay|id,ms:Roti comes from Hindi/Tamil.
+melk|milk|susu|susu|gatas|
+nacht|night|malam|malam|gabi|
+dag|day|hari|hari|araw|tl:Tagalog araw means both day and sun.
+kat|cat|kucing|kucing|pusa|
+hond|dog|anjing|anjing|aso|
+boek|book|buku|buku|aklat|id,ms:Buku comes from Dutch boek, 'book'.
+school|school|sekolah|sekolah|paaralan|id,ms:Sekolah comes from Portuguese escola.¦tl:Tagalog paaralan comes from aral, 'to learn'.
+zee|sea|laut|laut|dagat|
+zon|sun|matahari|matahari|araw|id,ms:Matahari literally means 'eye of the day'.
+maan|moon|bulan|bulan|buwan|Bulan and buwan: same Austronesian root, and also the word for 'month'.
+ster|star|bintang|bintang|bituin|Same root: bintang and bituin.
+boom|tree|pohon|pokok|puno|
+bloem|flower|bunga|bunga|bulaklak|
+vriend|friend|teman|kawan|kaibigan|ms,tl:Malay kawan and Tagalog kaibigan are related.
+familie|family|keluarga|keluarga|pamilya|id,ms:Keluarga comes from Sanskrit.¦tl:Tagalog pamilya comes from Spanish familia.
+vader|father|ayah|bapa|ama|id:To an older man you politely say bapak.
+moeder|mother|ibu|ibu|ina|
+hand|hand|tangan|tangan|kamay|
+oog|eye|mata|mata|mata|The same word in all three, for thousands of years.
+hoofd|head|kepala|kepala|ulo|
+hart|heart|jantung|jantung|puso|
+rood|red|merah|merah|pula|
+wit|white|putih|putih|puti|Putih and puti: same root.
+zwart|black|hitam|hitam|itim|Hitam and itim: same root.
+groen|green|hijau|hijau|berde|tl:Tagalog berde comes from Spanish verde.
+groot|big|besar|besar|malaki|
+klein|small|kecil|kecil|maliit|
+nieuw|new|baru|baru|bago|
+goed|good|baik|baik|mabuti|
+eten|eat|makan|makan|kumain|tl:Tagalog kain + the infix -um- = kumain. Compare makan.
+drinken|drink|minum|minum|uminom|Minum and inom: same root.
+slapen|sleep|tidur|tidur|matulog|
+kopen|buy|membeli|membeli|bumili|All share the root beli/bili: mem-beli in Indonesian and Malay, b-um-ili in Tagalog.
+vandaag|today|hari ini|hari ini|ngayong araw|
+morgen|tomorrow|besok|esok|bukas|id,ms:Indonesian besok, Malay esok.
+nu|now|sekarang|sekarang|ngayon|
+een|one|satu|satu|isa|
+twee|two|dua|dua|dalawa|
+drie|three|tiga|tiga|tatlo|
+vijf|five|lima|lima|lima|Lima also means 'hand' in many related languages: five fingers.
+tien|ten|sepuluh|sepuluh|sampu|
+weg|road|jalan|jalan|daan|
+tijd|time|waktu|masa|oras|id:Waktu comes from Arabic.¦tl:Tagalog oras comes from Spanish horas.
+auto|car|mobil|kereta|kotse|ms:Malay kereta means car; in Indonesian kereta is a train.¦tl:Tagalog kotse comes from Spanish coche.
+kantoor|office|kantor|pejabat|opisina|id:Indonesian kantor comes from Dutch kantoor.¦tl:Tagalog opisina comes from Spanish oficina.
+ja|yes|ya|ya|oo|
+dank je|thank you|terima kasih|terima kasih|salamat|id,ms:Terima kasih literally means 'receive love'.¦tl:Salamat comes from Arabic.
+kind|child|anak|anak|anak|The same word in all three.
+man|man|laki-laki|lelaki|lalaki|
+vrouw|woman|perempuan|perempuan|babae|
+deur|door|pintu|pintu|pinto|Pintu and pinto: same root.
+tafel|table|meja|meja|mesa|id,ms:Meja comes from Portuguese mesa.¦tl:Tagalog mesa comes from Spanish mesa.
+stoel|chair|kursi|kerusi|silya|id,ms:Kursi comes from Arabic.¦tl:Tagalog silya comes from Spanish silla.
+bed|bed|tempat tidur|katil|kama|id:Tempat tidur literally means 'sleeping place'.¦tl:Tagalog kama comes from Spanish cama.
+sleutel|key|kunci|kunci|susi|
+mens|person|orang|orang|tao|id,ms:Orang is in orangutan: 'person of the forest'.
+vis|fish|ikan|ikan|isda|
+vlees|meat|daging|daging|karne|tl:Tagalog karne comes from Spanish carne.
+ei|egg|telur|telur|itlog|Telur and itlog: same root.
+rijst|rice|nasi|nasi|kanin|id,ms:Nasi is cooked rice; uncooked it is beras.
+zout|salt|garam|garam|asin|
+suiker|sugar|gula|gula|asukal|tl:Tagalog asukal comes from Spanish azúcar.
+koffie|coffee|kopi|kopi|kape|
+fruit|fruit|buah|buah|prutas|tl:Tagalog prutas comes from Spanish frutas.
+markt|market|pasar|pasar|palengke|id,ms:Pasar comes from Persian, like bazaar.
+trein|train|kereta api|kereta api|tren|id,ms:Kereta api literally means 'fire carriage'.
+station|station|stasiun|stesen|estasyon|
+straat|street|jalan|jalan|kalye|id,ms:Jalan means both street and road.¦tl:Tagalog kalye comes from Spanish calle.
+brug|bridge|jembatan|jambatan|tulay|
+haven|harbour|pelabuhan|pelabuhan|daungan|
+noord|north|utara|utara|hilaga|
+zuid|south|selatan|selatan|timog|
+oost|east|timur|timur|silangan|id,ms:Timur shows up in East Timor.
+west|west|barat|barat|kanluran|
+stad|city|kota|bandar|lungsod|
+geld|money|uang|wang|pera|tl:Tagalog pera comes from Spanish perra, an old coin.
+brief|letter|surat|surat|liham|
+schrijven|write|menulis|menulis|sumulat|
+lezen|read|membaca|membaca|bumasa|Root baca/basa; Tagalog inserts -um- again.
+leren|learn|belajar|belajar|mag-aral|tl:The same aral as in paaralan (school).
+leraar|teacher|guru|guru|guro|From Sanskrit, like English guru.
+werken|work|bekerja|bekerja|magtrabaho|tl:Tagalog trabaho comes from Spanish trabajo.
+papier|paper|kertas|kertas|papel|
+winkel|shop|toko|kedai|tindahan|
+berg|mountain|gunung|gunung|bundok|tl:Tagalog bundok gave English the word boondocks.
+rivier|river|sungai|sungai|ilog|
+hemel|sky|langit|langit|langit|The same word in all three.
+wind|wind|angin|angin|hangin|Angin and hangin: same root.
+regen|rain|hujan|hujan|ulan|Hujan and ulan: same root.
+vuur|fire|api|api|apoy|Api and apoy: same root.
+vogel|bird|burung|burung|ibon|
+steen|stone|batu|batu|bato|Batu and bato: same root.
+mond|mouth|mulut|mulut|bibig|
+oor|ear|telinga|telinga|tainga|Telinga and tainga: same root.
+neus|nose|hidung|hidung|ilong|Hidung and ilong: same root.
+voet|foot|kaki|kaki|paa|
+tand|tooth|gigi|gigi|ngipin|
+bloed|blood|darah|darah|dugo|
+ziek|sick|sakit|sakit|may sakit|
+arts|doctor|dokter|doktor|doktor|id:Indonesian dokter comes from Dutch.
+ziekenhuis|hospital|rumah sakit|hospital|ospital|id:Rumah sakit literally means 'sick house'.
+jaar|year|tahun|tahun|taon|Tahun and taon: same root.
+maand|month|bulan|bulan|buwan|The same word as for moon.
+uur|hour|jam|jam|oras|id,ms:Jam also means clock.
+week|week|minggu|minggu|linggo|Minggu and linggo come from Portuguese and Spanish domingo and also mean Sunday.
+ochtend|morning|pagi|pagi|umaga|
+gisteren|yesterday|kemarin|semalam|kahapon|
+blauw|blue|biru|biru|asul|tl:Tagalog asul comes from Spanish azul.
+geel|yellow|kuning|kuning|dilaw|
+mooi|beautiful|cantik|cantik|maganda|
+oud|old|tua|tua|matanda|
+warm|hot|panas|panas|mainit|
+koud|cold|dingin|sejuk|malamig|
+slecht|bad|buruk|buruk|masama|
+nee|no|tidak|tidak|hindi|
+naam|name|nama|nama|pangalan|id,ms:Nama comes from Sanskrit and is related to English name.
+woord|word|kata|kata|salita|
+zeggen|say|berkata|berkata|sabihin|
+horen|hear|mendengar|mendengar|marinig|
+weten|know|tahu|tahu|alam|
+wie|who|siapa|siapa|sino|
+waar|where|di mana|di mana|saan|
+wat|what|apa|apa|ano|
+taal|language|bahasa|bahasa|wika|
+spreken|speak|berbicara|bercakap|magsalita|
+lied|song|lagu|lagu|awit|
+kunst|art|seni|seni|sining|
+feest|party|pesta|pesta|pista|From Portuguese and Spanish: festa and fiesta.
+koning|king|raja|raja|hari|id,ms:Raja comes from Sanskrit.
+oorlog|war|perang|perang|digmaan|
+vrede|peace|damai|damai|kapayapaan|
+land|country|negara|negara|bansa|
+wereld|world|dunia|dunia|mundo|id,ms:Dunia comes from Arabic.¦tl:Tagalog mundo comes from Spanish.
+geschiedenis|history|sejarah|sejarah|kasaysayan|
+muziek|music|musik|muzik|musika|`,["id","ms","tl"]);
+
+GER.forEach(w=>w.nl={w:w.key});
+const DATA={rom:ROM,ger:GER,cjk:CJK,sla:SLA,aus:AUS};
+/* Thema's: elk begrip hoort bij precies één thema. Een groep toont alleen de thema's waar hij begrippen voor heeft. */
+const THEMES=[
+  {key:"thuis",name:"Home & family",w:"huis|familie|vader|moeder|broer|zus|vriend|mens|sleutel|venster|hond|kat|slapen|kind|man|vrouw|deur|poort / deur|tafel|stoel|bed"},
+  {key:"eten",name:"Food & drink",w:"brood|melk|water|appel|koffie|eten|drinken|restaurant|markt|kopen|vis|vlees|ei|wijn|zout|kaas|fruit|suiker|groente|rijst|thee"},
+  {key:"reizen",name:"City & travel",w:"stad|plein|weg|kerk|auto|luchthaven|bank|oost|zuid|trein|station|straat|brug|haven|noord|west|reis|hotel"},
+  {key:"werk",name:"School & work",w:"school|student|leraar|universiteit|bibliotheek|boek|woordenboek|werken|kantoor|bedrijf|telefoon|krant|wetenschap|economie|geld|brief|schrijven|lezen|leren|papier|winkel|werk"},
+  {key:"natuur",name:"Nature & weather",w:"zon|maan|ster|zee|boom|bloem|berg|regen|weer|rivier|hemel|wind|sneeuw|vuur|vogel|steen"},
+  {key:"lichaam",name:"Body & health",w:"hand|oog|hoofd|hart|arts|ziekenhuis|mond|oor|neus|voet|been|arm|tand|bloed|ziek|ziekte|medicijn"},
+  {key:"tijd",name:"Time & numbers",w:"dag|nacht|week|maandag|vandaag|morgen|altijd|nu|tijd|een|twee|drie|vijf|tien|jaar|maand|uur|ochtend|gisteren|honderd"},
+  {key:"kleur",name:"Colours & qualities",w:"rood|wit|zwart|groen|groot|klein|nieuw|oud|goed|vol|blauw|geel|mooi|slecht|warm|koud|kleur"},
+  {key:"praten",name:"Talking & basics",w:"spreken|taal|dank je|ja|wat|vraag / probleem|nee|naam|woord|zeggen|horen|weten|wie|waar"},
+  {key:"cultuur",name:"Culture & society",w:"cultuur|geschiedenis|muziek|film|sport / beweging|wereld|land / staat|vrijheid|lied|kunst|feest|koning|oorlog|vrede|land|politiek"}];
+const THEME_OF={};THEMES.forEach(t=>t.w.split("|").forEach(nl=>THEME_OF[nl]=t.key));
+for(const k in DATA)DATA[k].forEach(w=>w.theme=THEME_OF[w.key]||"praten");
+const themeName=k=>(THEMES.find(t=>t.key===k)||{name:"All themes"}).name;
+/* Afstand tussen twee talen: 1 bijna gelijk · 2 dichtbij · 3 familie op afstand · 4 alleen leenwoorden */
+const LEVELS=[null,
+  {name:"Almost the same",desc:"Speakers largely understand each other."},
+  {name:"Close",desc:"Same branch; you recognise many words at once."},
+  {name:"Distant family",desc:"Related, but you need the sound rules."},
+  {name:"Loanwords only",desc:"Not related; the overlap is in shared words."}];
+const DIST={
+  "es-pt":[1,"Written text is largely readable for both."],
+  "es-it":[2],"it-pt":[2],"fr-it":[2,"French and Italian share many words; pronunciation differs a lot."],
+  "es-fr":[3,"Many shared words, but French sounds have changed a lot."],"fr-pt":[3],
+  "no-sv":[1,"Norwegians and Swedes understand each other fairly well."],
+  "da-no":[1,"Written Norwegian (bokmål) and Danish look very alike."],
+  "da-sv":[2,"Close on paper; spoken Danish is hard for Swedes."],
+  "de-sv":[3],"da-de":[3],"de-no":[3],
+  "de-nl":[2,"Dutch and German are close; a lot is readable at first sight."],"da-nl":[3],"nl-no":[3],"nl-sv":[3],
+  "ja-zh":[4,"Japanese writes with Chinese characters, but the languages are not related."],
+  "ko-zh":[4],"vi-zh":[4,"Vietnamese has many Chinese words, in Latin script."],
+  "ja-ko":[4,"The grammar is very alike, but a family link was never proven."],
+  "ja-vi":[4],
+  "ca-es":[2],"ca-pt":[2],"ca-fr":[2,"Catalan sits between Spanish and French."],"ca-it":[2],
+  "ca-ro":[3],"es-ro":[3],"it-ro":[3,"Romanian is the most distant Romance language, but Italians recognise a lot."],"fr-ro":[3],"pt-ro":[3],
+  "cs-sk":[1,"Czechs and Slovaks understand each other without effort."],"cs-pl":[2],"pl-sk":[2],
+  "pl-ru":[3,"Same family, but Russian uses Cyrillic script."],"cs-ru":[3],"ru-sk":[3],
+  "id-ms":[1,"Two varieties of the same language; mostly loanwords differ."],
+  "id-tl":[3,"Related, but Tagalog has a very different grammar."],"ms-tl":[3],"ko-vi":[4,"Both full of Chinese loanwords: 學生 is haksaeng and học sinh."]};
+const dist=(a,b)=>DIST[[a,b].sort().join("-")]||[4];
+const BANDS=[
+  {name:"Almost the same",desc:"So close that speakers largely understand each other."},
+  {name:"True family",desc:"One common ancestor, with regular sound rules."},
+  {name:"Look alike",desc:"Not a family, but a large shared vocabulary."}];
+const GROUPS=[
+  {key:"scan",band:0,name:"Scandinavian",desc:"Swedish, Norwegian and Danish",data:"ger",pool:["sv","no","da","de","nl"],def:["sv","no","da"]},
+  {key:"rom",band:1,name:"Romance",desc:"Descendants of Latin",data:"rom",pool:["es","it","pt","fr","ca","ro"],def:["es","it","pt"]},
+  {key:"iber",band:1,name:"Iberian",desc:"Spanish, Portuguese and Catalan",data:"rom",pool:["es","pt","ca","fr","it"],def:["es","pt","ca"]},
+  {key:"romeo",band:1,name:"Romance west–east",desc:"French, Italian and Romanian",data:"rom",pool:["fr","it","ro","es","ca","pt"],def:["fr","it","ro"]},
+  {key:"ger",band:1,name:"Germanic",desc:"The family of English and Dutch",data:"ger",pool:["de","sv","da","no","nl"],def:["de","sv","da"]},
+  {key:"sla",band:1,name:"Slavic",desc:"Two scripts, one family",data:"sla",pool:["ru","pl","cs","sk"],def:["ru","pl","cs"]},
+  {key:"aus",band:1,name:"Austronesian",desc:"Indonesian, Malay and Tagalog",data:"aus",pool:["id","ms","tl"],def:["id","ms","tl"]},
+  {key:"sino",band:2,name:"Sinosphere",desc:"Thousands of words from Chinese",data:"cjk",pool:["zh","ja","ko","vi"],def:["zh","ja","ko"]}];
+
+// storage
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const DAY=()=>{const d=new Date();return Math.floor((d.getTime()-d.getTimezoneOffset()*6e4)/864e5)};
+let prefs=Object.assign({group:"rom",n:3,sel:{},zin:50,theme:{}},store.get("talenrij-prefs",{}));prefs.theme=prefs.theme||{};
+let srs=store.get("talenrij-srs",{});      // srs[groep][begrip] = {b: vak 1–6, due: dagnummer}
+let daylog=store.get("talenrij-day",{});   // daylog[groep] = {day, newDone, revDone}
+(function migrate(){const old=store.get("talenrij-known2",null);if(!old||store.get("talenrij-migrated",false))return;
+  for(const g in old){srs[g]=srs[g]||{};for(const nl of old[g])if(!srs[g][nl])srs[g][nl]={b:2,due:DAY()+3}}
+  store.set("talenrij-srs",srs);store.set("talenrij-migrated",true)})();
+let group=GROUPS.find(g=>g.key===prefs.group)||GROUPS[1];
+let N=prefs.n===4?4:3, mode="today";
+const savePrefs=()=>{prefs.group=group.key;prefs.n=N;store.set("talenrij-prefs",prefs)};
+const allWords=()=>DATA[group.data];
+const themeKey=()=>{const t=prefs.theme[group.key];return t&&allWords().some(w=>w.theme===t)?t:"all"};
+// words() = begrippen in het gekozen thema; voortgang, herhalingen en de vierde taal tellen over de hele groep
+const words=()=>{const t=themeKey();return t==="all"?allWords():allWords().filter(w=>w.theme===t)};
+
+// gespreide herhaling: na een goed antwoord schuift een begrip een vak op; vak 3+ (7 dagen of meer) telt als stevig
+const INT=[0,1,3,7,14,30,60], STEVIG=3;
+const S=()=>srs[group.key]||(srs[group.key]={});
+const saveSrs=()=>{store.set("talenrij-srs",srs);store.set("talenrij-day",daylog)};
+const isStevig=w=>{const c=S()[w.key];return !!c&&c.b>=STEVIG};
+const stevigCount=()=>allWords().filter(isStevig).length;
+const threshold=()=>Math.min(100,Math.ceil(allWords().length*0.8));
+const unlocked4=()=>stevigCount()>=threshold();
+const dueList=()=>allWords().filter(w=>{const c=S()[w.key];return c&&c.due<=DAY()});
+const unseen=()=>words().filter(w=>!S()[w.key]);
+function dayLog(){const l=daylog[group.key];if(!l||l.day!==DAY())daylog[group.key]={day:DAY(),newDone:0,revDone:0};return daylog[group.key]}
+
+function langs(){const n=Math.min(N===4&&unlocked4()?4:3,group.pool.length);
+  let s=(prefs.sel[group.key]||group.def).filter(l=>group.pool.includes(l));
+  for(const l of [...group.def,...group.pool]){if(s.length>=n)break;if(!s.includes(l))s.push(l)}
+  s=s.slice(0,n);prefs.sel[group.key]=s;return s}
+let L=langs();
+function updStats(){document.getElementById("knownCount").textContent=`${stevigCount()} / ${allWords().length}`}
+
+// speech: best installed voice per language, whole row in turn, slow mode, auto-play
+const TTS_ALT={no:["nb","no","nn"],tl:["fil","tl"]};
+const VQ=/natural|neural|premium|enhanced|google|siri/i;
+let voices=[],sayTok=0,sayU=null,sayWord=null;
+let say=Object.assign({slow:false,auto:false},store.get("talenrij-say",{}));
+const hasTTS="speechSynthesis" in window;
+const vtag=v=>v.lang.replace("_","-").toLowerCase();
+function voiceFor(l){const tag=LANGS[l].tts.toLowerCase(),alts=TTS_ALT[l]||[tag.split("-")[0]];
+  let pool=voices.filter(v=>vtag(v)===tag);if(!pool.length)pool=voices.filter(v=>alts.includes(vtag(v).split("-")[0]));
+  if(!pool.length)return null;
+  return pool.find(v=>VQ.test(v.name)&&v.localService)||pool.find(v=>VQ.test(v.name))||pool.find(v=>v.localService)||pool[0]}
+// with an empty voice list we cannot tell yet, so we let the browser try
+const hasVoice=l=>hasTTS&&(!voices.length||!!voiceFor(l));
+const VOICE_HELP="Add the voice in your device settings. Windows: Settings › Time & language › Speech › Add voices. Android: Settings › Text-to-speech › install voice data. iPhone/iPad: Settings › Accessibility › Spoken Content › Voices. Mac: System Settings › Accessibility › Spoken Content.";
+let toastT=null;
+function toast(t){let el=document.getElementById("toast");if(!el){el=document.createElement("div");el.id="toast";el.setAttribute("role","status");document.body.appendChild(el)}
+  el.textContent=t;el.classList.add("on");clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove("on"),6000)}
+function markVoices(){document.querySelectorAll(".speak[data-lang]").forEach(b=>{const ok=hasVoice(b.dataset.lang);b.classList.toggle("novoice",!ok);
+  b.title=ok?"Pronounce":`No ${LANGS[b.dataset.lang].name} voice on this device`});
+  document.querySelectorAll("[data-missing]").forEach(el=>el.textContent=missingText())}
+function missingText(){const miss=L.filter(l=>!hasVoice(l));
+  return !hasTTS?"This browser cannot speak words aloud.":miss.length?`No voice on this device for ${miss.map(l=>LANGS[l].name).join(", ")}. Tap its ▶ for how to add one.`:""}
+if(hasTTS){const load=()=>{try{voices=speechSynthesis.getVoices()}catch(e){}markVoices()};load();
+  try{speechSynthesis.addEventListener("voiceschanged",load)}catch(e){speechSynthesis.onvoiceschanged=load}}
+function sayMark(l,on){document.querySelectorAll(`.speak[data-lang="${l}"]`).forEach(b=>b.classList.toggle("saying",on))}
+function stopSay(){sayTok++;document.querySelectorAll(".saying").forEach(b=>b.classList.remove("saying"));try{hasTTS&&speechSynthesis.cancel()}catch(e){}}
+function utter(text,l,tok,done){
+  if(!hasVoice(l)){if(!done)toast(hasTTS?`No ${LANGS[l].name} voice on this device. ${VOICE_HELP}`:"This browser cannot speak words aloud. Try Chrome, Edge or Safari.");done&&done();return}
+  try{const u=new SpeechSynthesisUtterance(text),v=voiceFor(l);u.lang=LANGS[l].tts;if(v)u.voice=v;u.rate=say.slow?.6:.9;
+    let fin=false;const end=()=>{if(fin)return;fin=true;sayMark(l,false);if(tok===sayTok&&done)setTimeout(()=>tok===sayTok&&done(),350)};
+    u.onstart=()=>sayMark(l,true);u.onend=end;u.onerror=end;sayU=u;speechSynthesis.speak(u)}catch(e){done&&done()}}
+function speak(text,lang){stopSay();utter(text,lang,sayTok)}
+// play every language of the row one after the other, skipping missing voices
+function speakRow(w){if(!w)return;stopSay();const tok=sayTok,q=L.filter(hasVoice);
+  if(!q.length){toast(hasTTS?`No voices on this device for this row. ${VOICE_HELP}`:"This browser cannot speak words aloud. Try Chrome, Edge or Safari.");return}
+  const next=()=>{if(tok!==sayTok)return;const l=q.shift();if(!l)return;utter(w[l].w,l,tok,next)};next()}
+const spk=(w,l)=>`<button class="speak${hasVoice(l)?"":" novoice"}" aria-label="Say in ${LANGS[l].name}" title="${hasVoice(l)?"Pronounce":`No ${LANGS[l].name} voice on this device`}" data-say="${encodeURIComponent(w)}" data-lang="${l}">▶</button>`;
+const spkAll=(w,key)=>`<button class="speak-all" data-all="${encodeURIComponent(w.key)}" title="Hear all ${L.length} languages in turn">▶ Hear all${key?"<kbd>P</kbd>":""}</button>`;
+const sayBar=w=>`<div class="saybar">${spkAll(w,true)}<label class="chk"><input type="checkbox" data-say-opt="slow" ${say.slow?"checked":""}> Slow</label><label class="chk"><input type="checkbox" data-say-opt="auto" ${say.auto?"checked":""}> Play the row when a card turns</label><p class="note" data-missing>${missingText()}</p></div>`;
+const wordByKey=k=>allWords().find(w=>w.key===k);
+document.addEventListener("change",e=>{const o=e.target.dataset&&e.target.dataset.sayOpt;if(o){say[o]=e.target.checked;store.set("talenrij-say",say)}});
+document.addEventListener("click",e=>{const a=e.target.closest(".speak-all");if(a){e.stopPropagation();speakRow(wordByKey(decodeURIComponent(a.dataset.all)));return}
+  const b=e.target.closest(".speak");if(b){e.stopPropagation();speak(decodeURIComponent(b.dataset.say),b.dataset.lang)}});
+
+// helpers
+const norm=s=>s.normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+function lev(a,b){const m=[...Array(b.length+1).keys()];for(let i=1;i<=a.length;i++){let p=m[0];m[0]=i;for(let j=1;j<=b.length;j++){const t=m[j];m[j]=Math.min(m[j]+1,m[j-1]+1,p+(a[i-1]===b[j-1]?0:1));p=t}}return m[b.length]}
+function kinship(w){
+  if(group.data==="cjk"){if(w.root==="—")return 0;const m=w.root.match(/\(([^)]+)\)/);if(!m||m[1]==="all")return 3;
+    const codes=m[1].toLowerCase().split("·");const hit=L.filter(l=>codes.includes(l)).length;return hit>=L.length?3:hit>=2?2:1}
+  const f=L.map(l=>norm(l==="ru"?w[l].r:w[l].w).replace(/^a /,""));let tot=0,c=0;
+  for(let i=0;i<f.length;i++)for(let j=i+1;j<f.length;j++){tot+=1-lev(f[i],f[j])/Math.max(f[i].length,f[j].length);c++}
+  const a=tot/c;return a>.8?3:a>.55?2:a>.3?1:0}
+const kinLabel=["different","partly related","related","almost the same"];
+const meter=n=>`<div class="meter" title="Relatedness">${[1,2,3].map(i=>`<span class="${i<=n?"on":""}"></span>`).join("")}</div>`;
+const cvar=l=>`--c:var(--${l});${LANGS[l].font?`--fw:${LANGS[l].font};`:""}`;
+function tips(w){const out=[];
+  if(w.root&&w.root!=="—")out.push(`<span>Shared characters <span class="root">${w.root}</span></span>`);
+  (w.tip||"").split("¦").filter(Boolean).forEach(seg=>{const m=seg.match(/^([a-z]{2}(?:,[a-z]{2})*):(.*)$/);
+    if(!m)out.push(`<span>${seg}</span>`);else if(m[1].split(",").some(l=>L.includes(l)))out.push(`<span>${m[2]}</span>`)});
+  return out.join("")}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a}
+const closePairs=()=>{const out=[];for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++)if(dist(L[i],L[j])[0]===1)out.push([L[i],L[j]]);return out};
+const pairName=p=>`${LANGS[p[0]].name}–${LANGS[p[1]].name}`;
+
+// ---------- dagplan
+const DIFF={rom:"easy",iber:"easy",romeo:"easy",ger:"easy",scan:"easy",sla:"mid",sino:"hard",aus:"hard"};
+// begrippen per dag bij rustig / standaard / intensief, per moeilijkheid en aantal talen
+const RANGES={3:{easy:[10,15,20],mid:[8,12,18],hard:[5,7.5,10]},4:{easy:[8,12,15],mid:[6,10,13],hard:[4,6,8]}};
+const TABLE={3:[["Relaxed","8–10","±25–30"],["Standard","12–15","±40"],["Intensive","20","±60"]],4:[["Relaxed","6–8","±25–30"],["Standard","10–12","±45"],["Intensive","15","±60"]]};
+const interp=(a,s)=>s<=50?a[0]+(a[1]-a[0])*s/50:a[1]+(a[2]-a[1])*(s-50)/50;
+const zinIdx=s=>s<34?0:s<67?1:2;
+function plan(){
+  const n=L.length>=4?4:3, d=DIFF[group.key]||"mid", notes=[];
+  const base=interp(RANGES[n][d],prefs.zin); let target=base;
+  if(d==="easy")notes.push({dir:"up",t:"Distance",x:"A lot is recognisable for an English speaker, so you are at the high end of the range."});
+  else if(d==="mid")notes.push({dir:"eq",t:"Distance",x:"Partly recognisable for an English speaker, so you are in the middle of the range."});
+  else notes.push({dir:"down",t:"Distance",x:`Almost everything is new, so it is reduced to ${n===4?"4–8":"5–10"} words.`});
+  const close=closePairs(), quizN=close.length?8:0;
+  if(close.length){target=Math.max(3,target-2);
+    notes.push({dir:"down",t:"Almost the same",x:`${close.map(pairName).join(" and ")} are easy to mix up: 2 words fewer, and every session ends with ${quizN} tell-apart questions.`})}
+  const lg=dayLog(), due=dueList().length, load=due+lg.revDone, ratio=load/Math.max(1,target);
+  let f=1; if(ratio>=10)f=0; else if(ratio>5)f=(10-ratio)/5;
+  if(f<1)notes.push({dir:"down",t:"Reviews",x:f===0?`${load} reviews today: more than 10× your new words. Review first today, no new words.`:`${load} reviews today: more than 5× your new words, so fewer new ones.`});
+  else notes.push({dir:"eq",t:"Reviews",x:load?`${load} reviews today: within the limit of 5× your new words.`:"No reviews yet. They come back by themselves once you learn words."});
+  target=Math.round(target*f);
+  const left=Math.max(0,target-lg.newDone), newToday=Math.min(left,unseen().length);
+  const tk=themeKey();
+  if(tk!=="all"){const u=unseen().length;
+    notes.push({dir:u<left?"down":"eq",t:"Theme",x:u?`New words come from ${themeName(tk).toLowerCase()} (${u} never seen)${u<left?`, so only ${u} new today`:""}. Reviews come from all themes, so your schedule keeps running.`
+      :`You have seen every word in ${themeName(tk).toLowerCase()}. Pick another theme for new words; reviews carry on.`})}
+  const min=Math.max(1,Math.round((due*6+newToday*2*(n*3+3)+quizN*6)/60));
+  return {n,d,base,target,newToday,due,quizN,close,notes,min,lg,left};
+}
+
+// ---------- picker
+function renderPicker(){
+  document.getElementById("bands").innerHTML=BANDS.map((b,bi)=>`<div class="band"><h3>${b.name}</h3><p>${b.desc}</p><div class="groups">${
+    GROUPS.filter(g=>g.band===bi).map(g=>`<button class="group" data-g="${g.key}" aria-pressed="${g===group}"><b>${g.name}</b><small>${g.desc}</small><span class="dots">${g.pool.map(l=>`<i style="background:var(--${l})" title="${LANGS[l].name}"></i>`).join("")}</span></button>`).join("")}</div></div>`).join("");
+  document.getElementById("chips").innerHTML=group.pool.map(l=>{const on=L.includes(l);
+    const near=on?"":Math.min(...L.map(x=>dist(l,x)[0]));
+    return `<button class="chip" style="${cvar(l)}" data-l="${l}" aria-pressed="${on}"${on?"":` title="Closest language in your row: ${LEVELS[near].name.toLowerCase()}"`}>${LANGS[l].name}${on?"":`<span class="dd" style="--d:var(--d${near})"></span>`}</button>`}).join("");
+  renderDist();
+  const has4=group.pool.length>=4, open=unlocked4();
+  const b3=document.querySelector('[data-n="3"]'), b4=document.querySelector('[data-n="4"]');
+  b3.setAttribute("aria-pressed",L.length<4);b4.setAttribute("aria-pressed",L.length===4);
+  b4.disabled=!has4||!open;b4.textContent=has4&&!open?"4 languages · locked":"4 languages";
+  let hint=group.pool.length>L.length?`Tap a language that is not selected to swap it in; the one chosen longest ago makes way. `:"";
+  if(!has4)hint+=`This group has ${group.pool.length} languages.`;
+  else if(!open)hint+=`The fourth language unlocks once ${threshold()} words are solid (now ${stevigCount()}).${threshold()<100?` This group has ${allWords().length} words, so the threshold is ${threshold()} instead of 100.`:""}`;
+  else hint+=`Fourth language available: ${stevigCount()} words are solid.`;
+  document.getElementById("hint").textContent=hint;
+  document.getElementById("rowbtn").innerHTML=`<b>${group.name}</b><span class="ls">${L.map(l=>`<span style="${cvar(l)}">${LANGS[l].name}</span>`).join("")}</span><span class="chev" aria-hidden="true">▾</span>`;
+  document.querySelectorAll(".group").forEach(b=>b.onclick=()=>{group=GROUPS.find(g=>g.key===b.dataset.g);L=langs();savePrefs();reset()});
+  document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{const l=b.dataset.l;if(L.includes(l))return;
+    L=[...L.slice(1),l];prefs.sel[group.key]=L;savePrefs();reset()});
+}
+document.querySelectorAll("[data-n]").forEach(b=>b.onclick=()=>{if(b.disabled)return;N=+b.dataset.n;L=langs();savePrefs();reset()});
+
+function renderThemes(){
+  const all=allWords(), cell=(key,name,ws)=>{const st=ws.filter(isStevig).length,seen=ws.filter(w=>S()[w.key]).length;
+    return `<button class="theme${ws.length&&st===ws.length?" done":""}" data-t="${key}" aria-pressed="${themeKey()===key}"><b>${name}</b><small>${seen} / ${ws.length} seen · ${st} solid</small><span class="mini"><i style="width:${ws.length?st/ws.length*100:0}%"></i></span></button>`};
+  document.getElementById("themes").innerHTML=cell("all","All themes",all)+THEMES.map(t=>{const ws=all.filter(w=>w.theme===t.key);return ws.length?cell(t.key,t.name,ws):""}).join("");
+  document.querySelectorAll(".theme").forEach(b=>b.onclick=()=>{prefs.theme[group.key]=b.dataset.t;savePrefs();reset()});
+}
+function renderDist(){
+  const pairs=[];for(let i=0;i<L.length;i++)for(let j=i+1;j<L.length;j++){const [lv,note]=dist(L[i],L[j]);pairs.push({a:L[i],b:L[j],lv,note})}
+  pairs.sort((x,y)=>x.lv-y.lv);
+  const max=Math.max(...pairs.map(p=>p.lv)),min=Math.min(...pairs.map(p=>p.lv));
+  const span=min===max?LEVELS[max].name.toLowerCase():`from ${LEVELS[min].name.toLowerCase()} to ${LEVELS[max].name.toLowerCase()}`;
+  document.getElementById("dist").innerHTML=`<div class="dist-head">
+      <div class="dist-sum">Distance in your row <span class="badge" style="--d:var(--d${max})">${span}</span></div>
+      <div class="scale4">${[1,2,3,4].map(i=>`<span><i style="--d:var(--d${i})"></i>${LEVELS[i].name}</span>`).join("")}</div></div>
+    <div class="pairs">${pairs.map(p=>`<div class="pair" style="--d:var(--d${p.lv})">
+      <div class="names"><b style="--c:var(--${p.a})">${LANGS[p.a].name}</b>↔<b style="--c:var(--${p.b})">${LANGS[p.b].name}</b></div>
+      <div class="lvl">${LEVELS[p.lv].name}</div><p>${p.note||LEVELS[p.lv].desc}</p></div>`).join("")}</div>
+    ${group.pool.length>L.length?`<div class="note">The dot on an unselected language shows how close it is to your row.</div>`:""}`;
+}
+
+// ---------- shared card + quiz markup
+function cardHTML(w,revealed,badge){const t=revealed?tips(w):"";
+  return `${badge?`<div><span class="tag ${badge.cls}">${badge.txt}</span>${themeKey()==="all"?`<span class="tag theme-tag">${themeName(w.theme)}</span>`:""}</div>`:""}
+    <div class="prompt">${w.en}</div>
+    <div class="lanes">${L.map(l=>`<div class="lane" style="${cvar(l)}"><div class="lab">${LANGS[l].name}</div>
+      <div class="w ${revealed?"":"hidden-w"}">${w[l].w}${revealed?spk(w[l].w,l):""}</div>${revealed&&w[l].r?`<div class="r">${w[l].r}</div>`:""}</div>`).join("")}</div>
+    ${revealed?sayBar(w):""}
+    ${t?`<div class="tip" style="margin:0">${t}</div>`:""}`}
+function quizHTML(q,hintTxt){const {w,target,order,done,picked}=q;
+  return `<div class="prompt">${w.en}</div>
+    <div class="ask" style="${cvar(target)}">Which one is <em>${LANGS[target].name}</em>?</div>
+    <div class="opts">${order.map((l,i)=>`<button class="opt ${done?(l===target?"right":l===picked?"wrong":""):""}" style="${cvar(l)}" data-l="${l}">
+      <div class="lab">${done?LANGS[l].name:"&nbsp;"}</div><div class="w">${w[l].w}</div>${w[l].r?`<div class="r">${w[l].r}</div>`:""}<div class="note" style="margin-top:6px">key ${i+1}</div></button>`).join("")}</div>
+    ${done?`<div class="tip" style="margin:0">${tips(w)||"Watch the sounds and spelling that belong to each language."}</div>`:`<p class="note">${hintTxt}</p>`}`}
+
+// ---------- VANDAAG
+let sess=null;
+function renderToday(){
+  if(sess&&sess.phase==="cards")return renderSessCard();
+  if(sess&&sess.phase==="quiz")return renderSessQuiz();
+  if(sess&&sess.phase==="done")return renderSessDone();
+  const m=document.getElementById("main");
+  m.innerHTML=`<div class="stage today">
+    <div class="today-top"><div><div class="eyebrow">Today in your row</div><div class="ask" style="margin-top:4px">${L.map(l=>LANGS[l].name).join(" · ")}</div></div>
+      <div class="note">${stevigCount()} of ${allWords().length} words solid${themeKey()!=="all"?` · ${themeName(themeKey())}: ${unseen().length} of ${words().length} never seen`:` · ${unseen().length} never seen`}</div></div>
+    <div class="zin">
+      <label for="zin" class="zin-label">How much do you feel like doing each day? <b id="zinName"></b></label>
+      <input type="range" id="zin" min="0" max="100" step="1" value="${prefs.zin}" aria-describedby="zinName">
+      <div class="ticks" id="ticks"></div>
+    </div>
+    <div id="planOut"></div>
+  </div>`;
+  const z=document.getElementById("zin");
+  z.addEventListener("input",()=>{prefs.zin=+z.value;savePrefs();updatePlan()});
+  updatePlan();
+}
+function updatePlan(){
+  const p=plan(), idx=zinIdx(prefs.zin), row=TABLE[p.n];
+  document.getElementById("zinName").textContent=row[idx][0];
+  document.getElementById("ticks").innerHTML=row.map((r,i)=>`<span class="${i===idx?"on":""}"><b>${r[0]}</b>${r[1]} words<br>${r[2]} forms</span>`).join("");
+  const nothing=!p.newToday&&!p.due;
+  const doneMsg=p.left===0&&p.target>0?`Your ${p.target} new words for today are done.`:!unseen().length?"You have already seen every word in this group.":"";
+  document.getElementById("planOut").innerHTML=`
+    <div class="tiles">
+      <div class="tile"><b>${p.newToday}</b><span>new words</span><small>= ${p.newToday*p.n} forms in ${p.n} languages</small></div>
+      <div class="tile"><b>${p.due}</b><span>reviews</span><small>words coming back today</small></div>
+      <div class="tile"><b>≈ ${nothing&&!p.quizN?0:p.min}</b><span>minutes</span><small>${p.quizN?`including ${p.quizN} tell-apart questions`:"estimated"}</small></div>
+    </div>
+    <ul class="adj">${p.notes.map(n=>`<li class="${n.dir}"><span class="arrow" aria-hidden="true">${n.dir==="up"?"↑":n.dir==="down"?"↓":"="}</span><div><b>${n.t}</b> ${n.x}</div></li>`).join("")}</ul>
+    <p class="note">Base for ${p.n} languages at "${row[idx][0].toLowerCase()}": ${row[idx][1]} words. After adjustments: <b>${p.target}</b> a day.${doneMsg?" "+doneMsg:""}</p>
+    ${group.pool.length>=4?`<div class="lock"><div class="meta"><span>Fourth language${unlocked4()?" unlocked":""}</span><span>${Math.min(stevigCount(),threshold())} / ${threshold()} solid</span></div><div class="progress"><div style="width:${Math.min(100,stevigCount()/threshold()*100)}%"></div></div></div>`:""}
+    <div class="actions">${nothing&&!p.quizN?`<button class="btn" disabled>Nothing left to do today</button>`
+      :`<button class="btn primary" id="start">Start session<kbd>space</kbd></button>`}</div>`;
+  const st=document.getElementById("start");if(st)st.onclick=startSession;
+}
+function startSession(){
+  const p=plan();
+  const queue=shuffle(dueList()).map(w=>({w,isNew:false})).concat(unseen().slice(0,p.newToday).map(w=>({w,isNew:true})));
+  sess={queue,pos:0,revealed:false,lapsed:new Set(),phase:queue.length?"cards":(p.quizN?"quiz":"done"),
+    quizLeft:p.quizN,quizTotal:p.quizN,quizOk:0,close:p.close,good:0,bad:0,newCount:p.newToday,revCount:p.due,q:null};
+  renderToday();
+}
+function renderSessCard(){
+  const it=sess.queue[sess.pos], total=sess.queue.length;
+  document.getElementById("main").innerHTML=`<div class="stage">
+    <div class="progress"><div style="width:${sess.pos/total*100}%"></div></div>
+    <div class="meta"><span>Card ${sess.pos+1} of ${total}${sess.quizLeft?` · then ${sess.quizLeft} tell-apart questions`:""}</span><span>${sess.good} right · ${sess.bad} not yet</span></div>
+    ${cardHTML(it.w,sess.revealed,it.isNew?{cls:"new",txt:"New"}:sess.lapsed.has(it.w.key)?{cls:"again",txt:"Once more"}:{cls:"rev",txt:"Review"})}
+    <div class="actions">${sess.revealed?`<button class="btn good" id="yes">Knew it<kbd>J</kbd></button><button class="btn bad" id="no">Not yet<kbd>K</kbd></button>`
+      :`<button class="btn primary" id="show">Show the ${L.length} words<kbd>space</kbd></button>`}
+      <button class="btn" id="stop">Stop</button></div></div>`;
+  if(sess.revealed){document.getElementById("yes").onclick=()=>grade(true);document.getElementById("no").onclick=()=>grade(false)}
+  else document.getElementById("show").onclick=sessReveal;
+  document.getElementById("stop").onclick=()=>{sess=null;render()};
+}
+function sessReveal(){if(!sess||sess.phase!=="cards"||sess.revealed)return;sess.revealed=true;renderSessCard();markVoices();if(say.auto)speakRow(sess.queue[sess.pos].w)}
+function grade(ok){stopSay();
+  const it=sess.queue[sess.pos], nl=it.w.key, c=S()[nl], lg=dayLog();
+  if(!it.counted){it.counted=true;it.isNew?lg.newDone++:lg.revDone++}
+  if(ok){sess.good++;
+    if(sess.lapsed.has(nl))S()[nl]={b:1,due:DAY()+1};
+    else{const b=Math.min((c?c.b:0)+1,6);S()[nl]={b,due:DAY()+INT[b]}}}
+  else{sess.bad++;S()[nl]={b:1,due:DAY()+1};sess.lapsed.add(nl);sess.queue.push(it)}
+  saveSrs();updStats();
+  sess.pos++;sess.revealed=false;
+  if(sess.pos>=sess.queue.length)sess.phase=sess.quizLeft?"quiz":"done";
+  renderToday();
+}
+function newSessQ(){const pool=allWords().filter(w=>S()[w.key]);const src=pool.length?pool:allWords();
+  const w=src[Math.random()*src.length|0], pair=sess.close[Math.random()*sess.close.length|0];
+  sess.q={w,target:pair[Math.random()*2|0],order:shuffle(L),done:false}}
+function renderSessQuiz(){
+  if(!sess.q)newSessQ();
+  const n=sess.quizTotal-sess.quizLeft+1;
+  document.getElementById("main").innerHTML=`<div class="stage">
+    <div class="progress"><div style="width:${(n-1)/sess.quizTotal*100}%"></div></div>
+    <div class="meta"><span>Tell-apart question ${n} of ${sess.quizTotal} · ${sess.close.map(pairName).join(", ")}</span><span>${sess.quizOk} right</span></div>
+    ${quizHTML(sess.q,`Spot the difference: ${[...new Set(sess.close.flat())].map(l=>LANGS[l].hint).join("; ")}.`)}
+    ${sess.q.done?`<div class="actions"><button class="btn primary" id="next">${sess.quizLeft>1?"Next":"Finish"}<kbd>space</kbd></button></div>`:""}</div>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>sessPick(b.dataset.l));
+  const nx=document.getElementById("next");if(nx)nx.onclick=sessNext;
+}
+function sessPick(l){if(sess.q.done)return;sess.q.done=true;sess.q.picked=l;if(l===sess.q.target)sess.quizOk++;speak(sess.q.w[sess.q.target].w,sess.q.target);renderSessQuiz()}
+function sessNext(){sess.quizLeft--;sess.q=null;if(sess.quizLeft<=0)sess.phase="done";renderToday()}
+function renderSessDone(){
+  const tomorrow=allWords().filter(w=>{const c=S()[w.key];return c&&c.due<=DAY()+1}).length;
+  document.getElementById("main").innerHTML=`<div class="stage">
+    <div class="prompt">Session done</div>
+    <div class="tiles">
+      <div class="tile"><b>${sess.newCount}</b><span>new words</span><small>${sess.newCount*L.length} forms</small></div>
+      <div class="tile"><b>${sess.revCount}</b><span>reviewed</span><small>${sess.good} right · ${sess.bad} not yet</small></div>
+      <div class="tile"><b>${tomorrow}</b><span>back tomorrow</span><small>reviews lined up</small></div>
+    </div>
+    ${sess.quizTotal?`<p class="note">Tell-apart questions: ${sess.quizOk} of ${sess.quizTotal} right.</p>`:""}
+    <div class="actions"><button class="btn primary" id="back">Back to today's plan</button></div></div>`;
+  document.getElementById("back").onclick=()=>{sess=null;render()};
+}
+
+// ---------- WOORDENRIJ
+function renderList(){
+  const m=document.getElementById("main");
+  m.innerHTML=`<div style="display:flex;flex-direction:column;gap:14px"><input type="search" id="q" placeholder="Search all languages, e.g. 'night' or 'gakkō'" aria-label="Search"><div id="rows"></div></div>`;
+  const draw=()=>{const q=norm(document.getElementById("q").value.trim());
+    const rows=words().filter(w=>!q||norm([w.en,...L.map(l=>w[l].w+" "+(w[l].r||""))].join(" ")).includes(q));
+    const rowHTML=w=>{const k=kinship(w),t=tips(w);return `<div class="row">
+      <div class="nl">${w.en}${isStevig(w)?` <span class="stevig" title="Solid">✓</span>`:""}${meter(k)}<small>${kinLabel[k]}</small>${spkAll(w)}</div>
+      ${L.map(l=>`<div class="cell" style="${cvar(l)}"><div class="lab">${LANGS[l].name}</div><div class="w">${w[l].w}${spk(w[l].w,l)}</div>${w[l].r?`<div class="r">${w[l].r}</div>`:""}</div>`).join("")}
+      ${t?`<div class="tip">${t}</div>`:""}</div>`};
+    const secs=themeKey()==="all"?THEMES.map(th=>({th,ws:rows.filter(w=>w.theme===th.key)})).filter(x=>x.ws.length):[{ws:rows}];
+    document.getElementById("rows").innerHTML=secs.map(({th,ws})=>(th?`<div class="sec"><h2>${th.name}</h2><span>${ws.filter(isStevig).length} / ${ws.length} solid</span></div>`:"")+ws.map(rowHTML).join("")).join("")||`<p class="note">No words found.</p>`};
+  document.getElementById("q").addEventListener("input",()=>{draw();markVoices()});draw();
+}
+
+// ---------- VRIJ FLITSEN (telt niet mee in het dagplan)
+let deck=[],di=0,revealed=false,auto=false,autoT=null,onlyNew=false,session={good:0,bad:0};
+function buildDeck(){deck=shuffle(onlyNew?words().filter(w=>!isStevig(w)):words());di=0;revealed=false;session={good:0,bad:0}}
+function renderFlash(){
+  clearTimeout(autoT);const m=document.getElementById("main");
+  if(!deck.length){m.innerHTML=`<div class="stage"><div class="prompt">Everything in this row is solid.</div><div class="actions"><button class="btn primary" id="reset">Again with all words</button></div></div>`;
+    document.getElementById("reset").onclick=()=>{onlyNew=false;buildDeck();renderFlash()};return}
+  if(di>=deck.length){m.innerHTML=`<div class="stage"><div class="prompt">Round done</div><p class="meta"><span>${session.good} known · ${session.bad} to practise</span></p><div class="actions"><button class="btn primary" id="again">New round</button></div></div>`;
+    document.getElementById("again").onclick=()=>{buildDeck();renderFlash()};return}
+  m.innerHTML=`<div class="stage">
+    <div class="progress"><div style="width:${di/deck.length*100}%"></div></div>
+    <div class="meta"><span>Card ${di+1} of ${deck.length}</span><span>${session.good} known · ${session.bad} practise</span></div>
+    ${cardHTML(deck[di],revealed)}
+    <div class="timer"><div id="tbar"></div></div>
+    <div class="actions">${revealed?`<button class="btn good" id="yes">Knew it<kbd>J</kbd></button><button class="btn bad" id="no">Not yet<kbd>K</kbd></button>`:`<button class="btn primary" id="show">Show the ${L.length} words<kbd>space</kbd></button>`}</div>
+    <div class="meta"><label class="chk"><input type="checkbox" id="auto" ${auto?"checked":""}> Turbo: flip automatically after 3 s</label><label class="chk"><input type="checkbox" id="onlynew" ${onlyNew?"checked":""}> Only words that are not solid yet</label></div>
+    <p class="note">Free practice does not count towards your daily plan or review schedule.</p>
+  </div>`;
+  if(!revealed){document.getElementById("show").onclick=reveal;
+    if(auto){const b=document.getElementById("tbar");requestAnimationFrame(()=>{b.style.transition="width 3s linear";b.style.width="100%"});autoT=setTimeout(reveal,3000)}}
+  else{document.getElementById("yes").onclick=()=>answer(true);document.getElementById("no").onclick=()=>answer(false)}
+  document.getElementById("auto").onchange=e=>{auto=e.target.checked;renderFlash()};
+  document.getElementById("onlynew").onchange=e=>{onlyNew=e.target.checked;buildDeck();renderFlash()};
+}
+function reveal(){if(revealed||mode!=="flash")return;revealed=true;renderFlash();markVoices();if(say.auto)speakRow(deck[di])}
+function answer(ok){stopSay();const w=deck[di];ok?session.good++:session.bad++;if(!ok)deck.push(w);di++;revealed=false;renderFlash()}
+
+// ---------- RAAD DE TAAL
+let qz=null,score={streak:0,best:store.get("talenrij-best",0),ok:0,n:0};
+function newQ(){const ws=words();const w=ws[Math.random()*ws.length|0];qz={w,target:L[Math.random()*L.length|0],order:shuffle(L),done:false}}
+function renderQuiz(){
+  if(!qz)newQ();
+  document.getElementById("main").innerHTML=`<div class="stage">
+    <div class="meta"><span>Streak ${score.streak} · best ${score.best}</span><span>${score.ok} / ${score.n} right</span></div>
+    ${quizHTML(qz,`Clues: ${L.map(l=>LANGS[l].hint).join("; ")}.`)}
+    ${qz.done?`<div class="actions"><button class="btn primary" id="next">Next<kbd>space</kbd></button></div>`:""}
+  </div>`;
+  document.querySelectorAll(".opt").forEach(b=>b.onclick=()=>pick(b.dataset.l));
+  if(qz.done)document.getElementById("next").onclick=()=>{newQ();renderQuiz()};
+}
+function pick(l){if(qz.done)return;qz.done=true;qz.picked=l;score.n++;
+  if(l===qz.target){score.ok++;score.streak++;if(score.streak>score.best){score.best=score.streak;store.set("talenrij-best",score.best)}}else score.streak=0;
+  speak(qz.w[qz.target].w,qz.target);renderQuiz()}
+
+// ---------- shell
+function render(){const m=document.getElementById("main");m.style.setProperty("--n",L.length);m.className="n"+L.length;
+  renderPicker();renderThemes();updStats();stopSay();({today:renderToday,list:renderList,flash:renderFlash,quiz:renderQuiz})[mode]();markVoices()}
+function reset(){buildDeck();qz=null;sess=null;score.streak=0;render()}
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mode===mode));clearTimeout(autoT);render()});
+document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"||(e.target.tagName==="BUTTON"&&(e.code==="Space"||e.key==="Enter")))return;
+  const k=e.key.toLowerCase();
+  if(mode==="today"){
+    if(!sess){if(e.code==="Space"&&document.getElementById("start")){e.preventDefault();startSession()}return}
+    if(sess.phase==="cards"){if(e.code==="Space"){e.preventDefault();sessReveal()}else if(sess.revealed&&k==="p")speakRow(sess.queue[sess.pos].w);else if(sess.revealed&&k==="j")grade(true);else if(sess.revealed&&k==="k")grade(false)}
+    else if(sess.phase==="quiz"&&sess.q){const d=+e.key;if(!sess.q.done&&d>=1&&d<=L.length)sessPick(sess.q.order[d-1]);else if(sess.q.done&&e.code==="Space"){e.preventDefault();sessNext()}}
+  }
+  if(mode==="flash"){if(e.code==="Space"){e.preventDefault();reveal()}else if(revealed&&k==="p")speakRow(deck[di]);else if(revealed&&k==="j")answer(true);else if(revealed&&k==="k")answer(false)}
+  if(mode==="quiz"&&qz){const d=+e.key;if(!qz.done&&d>=1&&d<=L.length)pick(qz.order[d-1]);else if(qz.done&&e.code==="Space"){e.preventDefault();newQ();renderQuiz()}}});
+reset();
+
+// ---------- app shell: row toggle, backup, install, offline, onboarding
+const rowbtn=document.getElementById("rowbtn"),picker=document.getElementById("picker");
+rowbtn.onclick=()=>{const open=!picker.classList.contains("open");picker.classList.toggle("open",open);rowbtn.setAttribute("aria-expanded",open)};
+
+const KEYS=()=>{const out={};try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k.startsWith("talenrij-"))out[k]=localStorage.getItem(k)}}catch(e){}return out};
+document.getElementById("exportBtn").onclick=()=>{
+  const blob=new Blob([JSON.stringify({app:"talenrij",version:1,saved:new Date().toISOString(),data:KEYS()},null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=`talenrij-progress-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast("Progress saved as a file. Open it with Restore on another device to carry on there.")};
+const importFile=document.getElementById("importFile");
+document.getElementById("importBtn").onclick=()=>importFile.click();
+importFile.onchange=async()=>{const f=importFile.files[0];importFile.value="";if(!f)return;
+  try{const j=JSON.parse(await f.text());if(j.app!=="talenrij"||!j.data)throw 0;
+    if(!confirm("Replace the progress on this device with the backup from "+(j.saved||"").slice(0,10)+"?"))return;
+    for(const k in KEYS())localStorage.removeItem(k);
+    for(const k in j.data)if(k.startsWith("talenrij-"))localStorage.setItem(k,j.data[k]);
+    localStorage.setItem("talenrij-onboarded","true");location.reload()}
+  catch(e){toast("That file is not a Talenrij backup.")}};
+
+let installEvt=null;const installBtn=document.getElementById("installBtn");
+const standalone=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
+const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+addEventListener("beforeinstallprompt",e=>{e.preventDefault();installEvt=e;installBtn.hidden=false;document.querySelectorAll(".onb-install").forEach(b=>b.hidden=false)});
+addEventListener("appinstalled",()=>{installEvt=null;installBtn.hidden=true;toast("Talenrij is on your home screen now.")});
+async function doInstall(){if(!installEvt)return false;installEvt.prompt();const r=await installEvt.userChoice;installEvt=null;installBtn.hidden=true;return r.outcome==="accepted"}
+installBtn.onclick=doInstall;
+if(isIOS&&!standalone()){installBtn.hidden=false;installBtn.onclick=()=>toast("On iPhone or iPad: tap Share, then Add to Home Screen.")}
+
+const net=document.getElementById("netstate");
+const updNet=()=>{const on=navigator.onLine;net.classList.toggle("off",!on);net.lastElementChild.textContent=on?"Works offline":"Offline, your progress is still saved"};
+addEventListener("online",updNet);addEventListener("offline",updNet);updNet();
+
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){
+  addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist().catch(()=>{});
+}
+
+function onboarding(){
+  let returning=false;try{returning=localStorage.getItem("talenrij-onboarded")||localStorage.getItem("talenrij-prefs")||Object.values(store.get("talenrij-srs",{})).some(g=>Object.keys(g).length)}catch(e){returning=true}
+  if(returning)return;
+  const el=document.createElement("div");el.className="onb";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","Welcome to Talenrij");
+  document.body.appendChild(el);
+  const steps=standalone()?2:3;let step=0;
+  const finish=()=>{try{localStorage.setItem("talenrij-onboarded","true")}catch(e){}savePrefs();el.remove();reset()};
+  const bar=()=>`<div class="onb-steps">${Array.from({length:steps},(_,i)=>`<i class="${i<=step?"on":""}"></i>`).join("")}</div>`;
+  const demo=["es","it","pt"].map(l=>`<div class="lane" style="${cvar(l)}"><div class="lab">${LANGS[l].name}</div><div class="w">${{es:"noche",it:"notte",pt:"noite"}[l]}</div></div>`).join("");
+  const draw=()=>{
+    if(step===0)el.innerHTML=`<div class="onb-in">${bar()}<h2>Learn three languages at once</h2>
+      <p>Every word sits next to its relatives. Spot the pattern once and you remember three words.</p>
+      <div class="demo"><div style="grid-column:1/-1" class="ask">night</div>${demo}</div>
+      <ul><li>A short plan every day, with new words and reviews.</li><li>Words come back right before you forget them.</li><li>Hear every word, and the whole row in turn.</li></ul>
+      <div class="actions"><button class="btn primary" data-go>Get started</button></div></div>`;
+    if(step===1)el.innerHTML=`<div class="onb-in">${bar()}<h2>Pick your family</h2><p>How close should the languages be? You can change this any time.</p>
+      <div class="glist">${BANDS.map((b,bi)=>`<div class="band-h">${b.name}</div>`+GROUPS.filter(g=>g.band===bi).map(g=>`<button class="group" data-g="${g.key}" aria-pressed="${g===group}"><b>${g.name}</b><small>${g.def.map(l=>LANGS[l].name).join(" · ")}</small><span class="dots">${g.pool.map(l=>`<i style="background:var(--${l})"></i>`).join("")}</span></button>`).join("")).join("")}</div>
+      <div class="actions"><button class="btn primary" data-go>${steps===2?"Start learning":"Next"}</button></div></div>`;
+    if(step===2)el.innerHTML=`<div class="onb-in">${bar()}<h2>Keep it on your home screen</h2><p>Talenrij works offline once installed, so you can practise on the train or on a plane.</p>
+      <div class="howto">${isIOS?`<b>iPhone or iPad</b><span>Tap Share in Safari, then Add to Home Screen.</span>`:`<b>Android or computer</b><span>Tap Install below, or use your browser menu and choose Install app or Add to Home screen.</span>`}</div>
+      <div class="actions"><button class="btn onb-install" ${installEvt?"":"hidden"}>Install</button><button class="btn primary" data-go>Start learning</button></div></div>`;
+    el.querySelectorAll(".group").forEach(b=>b.onclick=()=>{group=GROUPS.find(g=>g.key===b.dataset.g);L=langs();el.querySelectorAll(".group").forEach(x=>x.setAttribute("aria-pressed",x===b))});
+    const inst=el.querySelector(".onb-install");if(inst)inst.onclick=async()=>{await doInstall();finish()};
+    el.querySelector("[data-go]").onclick=()=>{step++;step>=steps?finish():draw();el.scrollTop=0};
+    el.querySelector("[data-go]").focus()};
+  draw();
+}
+onboarding();
+</script>
+</body>
+</html>
