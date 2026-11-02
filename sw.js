@@ -1,6 +1,6 @@
 // Talenrij service worker: app shell precached, everything served cache-first and refreshed in the background.
 // Bump VERSION whenever index.html changes so phones pick up the new version.
-const VERSION = "talenrij-v1";
+const VERSION = "talenrij-v2";
 const SHELL = ["./", "index.html", "manifest.webmanifest", "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png", "icons/favicon-32.png"];
 const FONTS = "talenrij-fonts";
 
