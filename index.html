@@ -222,7 +222,7 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
   .rowbtn[aria-expanded="true"] .chev{transform:rotate(180deg)}
   .picker{display:none}.picker.open{display:flex}
   .bar{display:none}
-  .tabbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1.5px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
+  .tabbar{display:grid;grid-template-columns:repeat(5,1fr);position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--surface);border-top:1.5px solid var(--line);padding:6px max(6px,env(safe-area-inset-left,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(6px,env(safe-area-inset-right,0px))}
   .tabbar button{display:flex;flex-direction:column;align-items:center;gap:3px;border:0;background:transparent;color:var(--muted);font:700 .7rem var(--f-body);padding:6px 2px;border-radius:12px;cursor:pointer;min-height:52px}
   .tabbar svg{width:24px;height:24px}
   .tabbar button[aria-pressed="true"]{color:var(--ink);background:var(--bg)}
@@ -247,6 +247,12 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
 .onb .actions .btn{flex:1 1 auto}
 .onb .howto{background:var(--surface);border:1.5px solid var(--line);border-radius:14px;padding:14px 16px;display:flex;flex-direction:column;gap:6px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* replay loop */
+.lp-now{min-height:7.5rem;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:6px;border-radius:14px;background:var(--bg);padding:18px}
+.lp-lab{font:700 .72rem var(--f-body);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.lp-word{font:800 clamp(2rem,8vw,3.4rem)/1.1 var(--f-display);letter-spacing:-.01em;overflow-wrap:anywhere}
+.lp-now:not(.on) .lp-word{opacity:.35}.lp-rest{opacity:.35}
+.lp-set{display:flex;flex-direction:column;gap:14px}.lp-set .eyebrow{display:block;margin-bottom:6px}
 </style>
 </head>
 <body>
@@ -285,6 +291,7 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
       <button data-mode="flash" aria-pressed="false">Free flashcards</button>
       <button data-mode="quiz" aria-pressed="false">Guess the language</button>
       <button data-mode="list" aria-pressed="false">Word list</button>
+      <button data-mode="loop" aria-pressed="false">Replay loop</button>
     </div>
   </div>
 
@@ -310,6 +317,7 @@ body{margin:0;-webkit-tap-highlight-color:transparent}
   <button data-mode="flash" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="3" width="14" height="18" rx="3"/><path d="M3 7v11a3 3 0 0 0 3 3"/></svg><span>Flashcards</span></button>
   <button data-mode="quiz" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17.5v.01"/></svg><span>Guess</span></button>
   <button data-mode="list" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg><span>Words</span></button>
+  <button data-mode="loop" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a3 3 0 0 1 3-3h15"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a3 3 0 0 1-3 3H3"/></svg><span>Loop</span></button>
 </nav>
 
 <script>
@@ -1345,7 +1353,7 @@ function renderSessCard(){
 }
 function sessReveal(){if(!sess||sess.phase!=="cards"||sess.revealed)return;sess.revealed=true;renderSessCard();markVoices();if(say.auto)speakRow(sess.queue[sess.pos].w)}
 function grade(ok){stopSay();
-  const it=sess.queue[sess.pos], nl=it.w.key, c=S()[nl], lg=dayLog();
+  const it=sess.queue[sess.pos], nl=it.w.key, c=S()[nl], lg=dayLog();markStudied(nl);
   if(!it.counted){it.counted=true;it.isNew?lg.newDone++:lg.revDone++}
   if(ok){sess.good++;
     if(sess.lapsed.has(nl))S()[nl]={b:1,due:DAY()+1};
@@ -1382,8 +1390,131 @@ function renderSessDone(){
       <div class="tile"><b>${tomorrow}</b><span>back tomorrow</span><small>reviews lined up</small></div>
     </div>
     ${sess.quizTotal?`<p class="note">Tell-apart questions: ${sess.quizOk} of ${sess.quizTotal} right.</p>`:""}
-    <div class="actions"><button class="btn primary" id="back">Back to today's plan</button></div></div>`;
+    <div class="actions"><button class="btn primary" id="back">Back to today's plan</button><button class="btn" id="toLoop">▶ Replay today's words on loop</button></div></div>`;
   document.getElementById("back").onclick=()=>{sess=null;render()};
+  document.getElementById("toLoop").onclick=()=>{sess=null;lo.src="today";saveLo();document.querySelector('.tabbar [data-mode="loop"]').click()};
+}
+
+// ---------- REPLAY LOOP: today's words + English on repeat, with a quiet ambient bed kept out of the speech band
+// speechSynthesis cannot be routed through Web Audio, so the voices play untouched and only the ambient is filtered.
+// Every ambient source goes through a band-stop guard: a steep low-pass (below GUARD.lo) and a steep high-pass
+// (above GUARD.hi) in parallel, so nothing of the bed sits where the voices carry their meaning (≈300 Hz–3.4 kHz).
+const GUARD={lo:120,hi:5000,stages:6};
+let studied=store.get("talenrij-studied",{});   // studied[groep][begrip] = dag waarop het laatst geoefend is
+function markStudied(key){(studied[group.key]||(studied[group.key]={}))[key]=DAY();store.set("talenrij-studied",studied)}
+let lo=Object.assign({src:"today",amb:"water",vol:25,pace:"calm",order:"word",sleep:30,wake:false},store.get("talenrij-loop",{}));
+const saveLo=()=>store.set("talenrij-loop",lo);
+const LOOP_SRC={today:"Today",week:"Last 7 days",seen:"Everything studied"};
+function loopWords(src){const st=studied[group.key]||{},d=DAY();
+  if(src==="today")return allWords().filter(w=>st[w.key]===d);
+  if(src==="week")return allWords().filter(w=>st[w.key]>d-7);
+  return allWords().filter(w=>st[w.key]!=null||S()[w.key])}
+
+function guardChain(ctx,type,f,n){let first=null,last=null;
+  for(let i=0;i<n;i++){const b=ctx.createBiquadFilter();b.type=type;b.frequency.value=f;b.Q.value=Math.SQRT1_2;if(last)last.connect(b);else first=b;last=b}
+  return [first,last]}
+// seamless looping buffer: render a little extra and crossfade the tail into the head
+function loopBuffer(ctx,sec,fill){const sr=ctx.sampleRate,n=Math.floor(sec*sr),x=Math.floor(sr*1.5),buf=ctx.createBuffer(2,n,sr);
+  for(let c=0;c<2;c++){const a=new Float32Array(n+x);fill(a,sr,c);const out=buf.getChannelData(c);
+    for(let i=0;i<n;i++)out[i]=a[i];for(let i=0;i<x;i++){const t=i/x;out[i]=a[i]*Math.sqrt(t)+a[n+i]*Math.sqrt(1-t)}}
+  return buf}
+function waterBuffer(ctx){return loopBuffer(ctx,24,(a,sr,c)=>{
+  // low: brown noise rumble with a slow swell; high: a bed of tiny droplets (short noise bursts)
+  let b=0;const sw=2*Math.PI/(sr*12);
+  for(let i=0;i<a.length;i++){b=(b+(Math.random()*2-1)*.02)*.998;a[i]=b*3.2*(.65+.35*Math.sin(i*sw+c))}
+  let t=0;while(t<a.length){t+=Math.floor(sr*(.015+Math.random()*.07));const dec=sr*(.006+Math.random()*.03),amp=.08+Math.random()*.35,len=Math.floor(dec*5);
+    for(let k=0;k<len&&t+k<a.length;k++)a[t+k]+=(Math.random()*2-1)*amp*Math.exp(-k/dec)}
+  for(let i=0;i<a.length;i++)a[i]+=(Math.random()*2-1)*.03})}
+// builds the bed into dest and returns a stop function; also used by the offline spectrum test
+function buildAmbient(ctx,kind,dest){
+  const bus=ctx.createGain(),nodes=[];
+  const [l1,l2]=guardChain(ctx,"lowpass",GUARD.lo,GUARD.stages),[h1,h2]=guardChain(ctx,"highpass",GUARD.hi,GUARD.stages);
+  const hiTrim=ctx.createGain();hiTrim.gain.value=kind==="water"?1.2:.5;
+  bus.connect(l1);bus.connect(h1);l2.connect(dest);h2.connect(hiTrim);hiTrim.connect(dest);
+  const lfo=(freq,depth,param,phase)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=freq;g.gain.value=depth;o.connect(g);g.connect(param);o.start(ctx.currentTime+(phase||0));nodes.push(o)};
+  if(kind==="water"){const s=ctx.createBufferSource();s.buffer=waterBuffer(ctx);s.loop=true;s.connect(bus);s.start();nodes.push(s)}
+  if(kind==="calm"){
+    // meditation: a soft low drone (A1, E2, A2) that breathes, plus faint high bowl partials that swell in and out
+    [[55,.32],[82.41,.2],[110,.12]].forEach(([f,v],i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=f;g.gain.value=v*.6;
+      o.connect(g);g.connect(bus);o.start();nodes.push(o);lfo(.045+i*.013,v*.4,g.gain,i*3)});
+    [5274,6272,7040,8372].forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain(),p=ctx.createStereoPanner();o.frequency.value=f*(1+(i%2?.0012:-.0009));
+      g.gain.value=.018;p.pan.value=[-.6,.4,-.2,.7][i];o.connect(g);g.connect(p);p.connect(bus);o.start();nodes.push(o);lfo(.03+i*.011,.018,g.gain,i*5)});
+    const air=ctx.createBufferSource();air.buffer=loopBuffer(ctx,12,a=>{for(let i=0;i<a.length;i++)a[i]=(Math.random()*2-1)*.05});air.loop=true;air.connect(bus);air.start();nodes.push(air)}
+  return ()=>nodes.forEach(n=>{try{n.stop()}catch(e){}})}
+
+const amb={ctx:null,master:null,stop:null};
+const volGain=v=>.25*Math.pow(v/100,2);   // slider 0–100, default 25 ≈ −36 dB: very quiet under the voices
+function ambStart(){if(lo.amb==="none")return ambStop();
+  try{if(!amb.ctx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;amb.ctx=new AC();amb.master=amb.ctx.createGain();amb.master.gain.value=0;amb.master.connect(amb.ctx.destination)}
+    const c=amb.ctx;c.resume&&c.resume();if(amb.stop)amb.stop();amb.stop=buildAmbient(c,lo.amb,amb.master);
+    amb.master.gain.cancelScheduledValues(c.currentTime);amb.master.gain.setTargetAtTime(volGain(lo.vol),c.currentTime,.8)}catch(e){}}
+function ambStop(fade){if(!amb.ctx||!amb.stop)return;const c=amb.ctx,s=amb.stop;amb.stop=null;
+  amb.master.gain.cancelScheduledValues(c.currentTime);amb.master.gain.setTargetAtTime(0,c.currentTime,fade?3:.3);setTimeout(()=>{s();if(!amb.stop)c.suspend&&c.suspend()},fade?12000:1500)}
+function ambVol(){if(amb.ctx&&amb.stop)amb.master.gain.setTargetAtTime(volGain(lo.vol),amb.ctx.currentTime,.2)}
+
+// the loop itself: per word every language in the row, then the English (or the other way round), then a pause
+let lp={on:false,tok:0,list:[],i:0,part:-1,round:1,end:0,clock:null,wake:null,now:null};
+function enVoice(){const p=voices.filter(v=>/^en/i.test(v.lang));return p.find(v=>/en.GB/i.test(v.lang)&&VQ.test(v.name))||p.find(v=>VQ.test(v.name))||p.find(v=>/en.GB|en.US/i.test(v.lang))||p[0]||null}
+function loopParts(w){const ws=L.filter(hasVoice).map(l=>({t:w[l].w,l,name:LANGS[l].name})),en={t:w.en,l:"en",name:"English"};return lo.order==="en"?[en,...ws]:[...ws,en]}
+function loopSay(p,tok,done){
+  let fin=false;const go=()=>{if(fin)return;fin=true;clearTimeout(dog);if(tok===lp.tok)done()};
+  const dog=setTimeout(go,4000+p.t.length*400);   // some browsers never fire onend
+  try{const u=new SpeechSynthesisUtterance(p.t);u.lang=p.l==="en"?"en-GB":LANGS[p.l].tts;const v=p.l==="en"?enVoice():voiceFor(p.l);if(v){u.voice=v;u.lang=v.lang}
+    u.rate=lo.pace==="calm"?.75:.9;u.onend=go;u.onerror=go;speechSynthesis.speak(u)}catch(e){go()}}
+function loopStep(){const tok=lp.tok;if(!lp.on)return;
+  if(lp.end&&Date.now()>=lp.end){loopStop(true);toast("Sleep timer: the loop has stopped.");return}
+  const w=lp.list[lp.i],parts=loopParts(w);lp.part++;
+  if(lp.part>=parts.length){lp.part=-1;lp.i++;if(lp.i>=lp.list.length){lp.i=0;lp.round++;lp.list=shuffle(lp.list)}
+    loopShow();setTimeout(()=>tok===lp.tok&&loopStep(),lo.pace==="calm"?2600:1500);return}
+  lp.now=parts[lp.part];loopShow();loopSay(lp.now,tok,()=>setTimeout(()=>tok===lp.tok&&loopStep(),lo.pace==="calm"?700:350))}
+function loopStart(){const list=loopWords(lo.src);if(!list.length)return;
+  if(!hasTTS){toast("This browser cannot speak words aloud. Try Chrome, Edge or Safari.");return}
+  stopSay();lp.tok++;Object.assign(lp,{on:true,list:shuffle(list),i:0,part:-1,round:1,now:null,end:lo.sleep?Date.now()+lo.sleep*6e4:0});
+  ambStart();loopWake(true);loopMedia();clearInterval(lp.clock);lp.clock=setInterval(loopClock,1000);renderLoop();loopStep()}
+function loopStop(fade){if(!lp.on)return;lp.on=false;lp.tok++;lp.now=null;clearInterval(lp.clock);try{speechSynthesis.cancel()}catch(e){}
+  ambStop(fade);loopWake(false);if("mediaSession" in navigator)navigator.mediaSession.playbackState="paused";if(mode==="loop")renderLoop()}
+async function loopWake(on){try{if(on&&lo.wake&&navigator.wakeLock)lp.wake=await navigator.wakeLock.request("screen");else if(!on&&lp.wake){lp.wake.release();lp.wake=null}}catch(e){}}
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible"&&lp.on&&lo.wake)loopWake(true)});
+function loopMedia(){if(!("mediaSession" in navigator))return;try{
+  navigator.mediaSession.metadata=new MediaMetadata({title:`${LOOP_SRC[lo.src]}: ${lp.list.length} words`,artist:"Talenrij replay loop",album:L.map(l=>LANGS[l].name).join(" · ")});
+  navigator.mediaSession.playbackState="playing";
+  navigator.mediaSession.setActionHandler("play",()=>{if(!lp.on)loopStart()});navigator.mediaSession.setActionHandler("pause",()=>loopStop());navigator.mediaSession.setActionHandler("stop",()=>loopStop())}catch(e){}}
+const mmss=ms=>{const s=Math.max(0,Math.round(ms/1000));return `${Math.floor(s/60)}:${String(s%60).padStart(2,"0")}`};
+function loopClock(){const el=document.getElementById("lpClock");if(el)el.textContent=lp.end?`Stops in ${mmss(lp.end-Date.now())}`:"Plays until you stop it"}
+function loopShow(){const el=document.getElementById("lpNow");if(!el)return;const w=lp.list[lp.i];
+  el.innerHTML=lp.now?`<div class="lp-lab">${lp.now.name}</div><div class="lp-word" lang="${lp.now.l==="en"?"en":LANGS[lp.now.l].tts}" style="${lp.now.l!=="en"&&LANGS[lp.now.l].font?`font-family:${LANGS[lp.now.l].font}`:""}">${lp.now.t}</div>`:`<div class="lp-lab">&nbsp;</div><div class="lp-word lp-rest">· · ·</div>`;
+  const m=document.getElementById("lpMeta");if(m&&lp.on)m.textContent=`Round ${lp.round} · word ${Math.min(lp.i+1,lp.list.length)} of ${lp.list.length}${w?` · ${w.en}`:""}`}
+const lpSeg=(k,opts,cur)=>`<div class="seg" role="group">${opts.map(([v,t])=>`<button data-lp="${k}" data-v="${v}" aria-pressed="${String(v)===String(cur)}">${t}</button>`).join("")}</div>`;
+function renderLoop(){
+  const m=document.getElementById("main"),n={today:loopWords("today").length,week:loopWords("week").length,seen:loopWords("seen").length};
+  const list=lp.on?lp.list:loopWords(lo.src),miss=hasTTS?L.filter(l=>!hasVoice(l)):[];
+  m.innerHTML=`<div class="stage loop">
+    <div><div class="eyebrow">Replay loop</div><div class="ask" style="margin-top:4px">Let what you learned keep playing</div></div>
+    <p class="note">Plays each word in ${L.map(l=>LANGS[l].name).join(", ")} followed by the English, over and over, in a new order every round. A very quiet water or meditation sound plays underneath. Everything between ${GUARD.lo} Hz and ${GUARD.hi/1000} kHz is filtered out of that sound, so it never sits where the voices are. Headphones work best.</p>
+    <div class="lp-now${lp.on?" on":""}" id="lpNow"></div>
+    <div class="meta"><span id="lpMeta">${list.length?`${list.length} words ready`:""}</span><span id="lpClock"></span></div>
+    <div class="actions">${lp.on?`<button class="btn primary" id="lpGo">Stop loop<kbd>space</kbd></button>`
+      :list.length?`<button class="btn primary" id="lpGo">▶ Play on loop<kbd>space</kbd></button>`:`<button class="btn" disabled>No words yet</button>`}</div>
+    ${!list.length?`<p class="note">${lo.src==="today"?`You have not studied any words today yet. Do today's session first${n.week?`, or pick "Last 7 days" (${n.week} words)`:""}.`:"Study some words first in Today or Flashcards; they will show up here."}</p>`:""}
+    ${miss.length?`<p class="note">No voice on this device for ${miss.map(l=>LANGS[l].name).join(", ")}; those are skipped. ${VOICE_HELP}</p>`:""}
+    <div class="lp-set">
+      <div><div class="eyebrow">Words</div>${lpSeg("src",[["today",`Today (${n.today})`],["week",`7 days (${n.week})`],["seen",`All (${n.seen})`]],lo.src)}</div>
+      <div><div class="eyebrow">Background</div>${lpSeg("amb",[["water","Flowing water"],["calm","Meditation"],["none","None"]],lo.amb)}</div>
+      <div><label class="eyebrow" for="lpVol">Background volume</label><input type="range" id="lpVol" min="0" max="100" value="${lo.vol}" ${lo.amb==="none"?"disabled":""}></div>
+      <div><div class="eyebrow">Pace</div>${lpSeg("pace",[["calm","Calm"],["normal","Normal"]],lo.pace)}</div>
+      <div><div class="eyebrow">Order</div>${lpSeg("order",[["word","Word, then English"],["en","English, then word"]],lo.order)}</div>
+      <div><div class="eyebrow">Stop after</div>${lpSeg("sleep",[[15,"15 min"],[30,"30 min"],[60,"1 hour"],[0,"Never"]],lo.sleep)}</div>
+      <label class="chk"><input type="checkbox" id="lpWake" ${lo.wake?"checked":""} ${"wakeLock" in navigator?"":"disabled"}> Keep the screen on while it plays${"wakeLock" in navigator?"":" (not supported here)"}</label>
+    </div>
+    <p class="note">On phones the voices can pause when the screen locks; keep the screen on (dimmed) for a full night loop.</p>
+  </div>`;
+  loopShow();loopClock();
+  const go=document.getElementById("lpGo");if(go)go.onclick=()=>lp.on?loopStop():loopStart();
+  document.querySelectorAll("[data-lp]").forEach(b=>b.onclick=()=>{const k=b.dataset.lp,v=b.dataset.v;lo[k]=k==="sleep"?+v:v;saveLo();
+    if(lp.on){if(k==="amb")ambStart();if(k==="sleep")lp.end=lo.sleep?Date.now()+lo.sleep*6e4:0;if(k==="src"){const l=loopWords(lo.src);if(l.length){lp.list=shuffle(l);lp.i=0;lp.part=-1}}}
+    renderLoop()});
+  const vol=document.getElementById("lpVol");vol.oninput=()=>{lo.vol=+vol.value;saveLo();ambVol()};
+  document.getElementById("lpWake").onchange=e=>{lo.wake=e.target.checked;saveLo();if(lp.on)loopWake(e.target.checked)};
 }
 
 // ---------- WOORDENRIJ
@@ -1426,7 +1557,7 @@ function renderFlash(){
   document.getElementById("onlynew").onchange=e=>{onlyNew=e.target.checked;buildDeck();renderFlash()};
 }
 function reveal(){if(revealed||mode!=="flash")return;revealed=true;renderFlash();markVoices();if(say.auto)speakRow(deck[di])}
-function answer(ok){stopSay();const w=deck[di];ok?session.good++:session.bad++;if(!ok)deck.push(w);di++;revealed=false;renderFlash()}
+function answer(ok){stopSay();const w=deck[di];markStudied(w.key);ok?session.good++:session.bad++;if(!ok)deck.push(w);di++;revealed=false;renderFlash()}
 
 // ---------- RAAD DE TAAL
 let qz=null,score={streak:0,best:store.get("talenrij-best",0),ok:0,n:0};
@@ -1447,9 +1578,9 @@ function pick(l){if(qz.done)return;qz.done=true;qz.picked=l;score.n++;
 
 // ---------- shell
 function render(){const m=document.getElementById("main");m.style.setProperty("--n",L.length);m.className="n"+L.length;
-  renderPicker();renderThemes();updStats();stopSay();({today:renderToday,list:renderList,flash:renderFlash,quiz:renderQuiz})[mode]();markVoices()}
+  renderPicker();renderThemes();updStats();stopSay();({today:renderToday,list:renderList,flash:renderFlash,quiz:renderQuiz,loop:renderLoop})[mode]();markVoices()}
 function reset(){buildDeck();qz=null;sess=null;score.streak=0;render()}
-document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mode===mode));clearTimeout(autoT);render()});
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{if(b.dataset.mode!=="loop")loopStop();mode=b.dataset.mode;document.querySelectorAll("[data-mode]").forEach(x=>x.setAttribute("aria-pressed",x.dataset.mode===mode));clearTimeout(autoT);render()});
 document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"||(e.target.tagName==="BUTTON"&&(e.code==="Space"||e.key==="Enter")))return;
   const k=e.key.toLowerCase();
   if(mode==="today"){
@@ -1458,6 +1589,7 @@ document.addEventListener("keydown",e=>{if(e.target.tagName==="INPUT"||(e.target
     else if(sess.phase==="quiz"&&sess.q){const d=+e.key;if(!sess.q.done&&d>=1&&d<=L.length)sessPick(sess.q.order[d-1]);else if(sess.q.done&&e.code==="Space"){e.preventDefault();sessNext()}}
   }
   if(mode==="flash"){if(e.code==="Space"){e.preventDefault();reveal()}else if(revealed&&k==="p")speakRow(deck[di]);else if(revealed&&k==="j")answer(true);else if(revealed&&k==="k")answer(false)}
+  if(mode==="loop"&&e.code==="Space"&&document.getElementById("lpGo")){e.preventDefault();lp.on?loopStop():loopStart()}
   if(mode==="quiz"&&qz){const d=+e.key;if(!qz.done&&d>=1&&d<=L.length)pick(qz.order[d-1]);else if(qz.done&&e.code==="Space"){e.preventDefault();newQ();renderQuiz()}}});
 reset();
 
